@@ -25,7 +25,7 @@ Il est impératif que chacun comprenne le projet dans sa globalité. Même si on
 ### Suivi du temps de travail (À remplir par chacun)
 *Pensez à noter vos heures ici ou sur un brouillon au fur et à mesure, on en aura besoin pour l'annexe du rapport final !*
 
-* **Evrard :** 1H30 heures
+* **Evrard :** 1H30 
 * **Romain :** X heures
 * **Thibaud :** X heures
 * **Zhouair :** X heures
