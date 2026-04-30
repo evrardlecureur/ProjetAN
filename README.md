@@ -1,12 +1,12 @@
-# 🐺 Projet d'Analyse Numérique : Étude d'une Cascade Trophique
+# Projet d'Analyse Numérique : Étude d'une Cascade Trophique
 
 Bienvenue sur le dépôt de notre projet d'Analyse Numérique (2025-2026).
 **Équipe :** Evrard, Romain, Thibaud, et Zhouair.
 
-## 🎯 Objectif du Projet
+## Objectif du Projet
 Modéliser et simuler l'évolution d'un écosystème à 5 populations (Végétation, Wapitis/Orignaux, Cerfs, Loups, Ours) en utilisant un système d'équations différentielles ordinaires (EDO).
 
-## 📋 Répartition des Tâches (Pipeline de travail)
+## Répartition des Tâches (Pipeline de travail)
 
 | Étape | Membre | Rôle & Tâches Principales | Livrables (Rapport & Soutenance) |
 | :---: | :--- | :--- | :--- |
@@ -17,11 +17,16 @@ Modéliser et simuler l'évolution d'un écosystème à 5 populations (Végétat
 
 ---
 
-### ⏱️ Suivi du temps de travail (À remplir par chacun)
+### Suivi du temps de travail (À remplir par chacun)
 *Pensez à noter vos heures ici ou sur un brouillon au fur et à mesure, on en aura besoin pour l'annexe du rapport final !*
 
 * **Evrard :** X heures
 * **Romain :** X heures
 * **Thibaud :** X heures
 * **Zhouair :** X heures
+
+---
+
+## Rapport LaTeX
+Le code source de notre rapport final se trouve dans le fichier `rapport.tex` présent dans ce dépôt. Chacun peut le modifier pour ajouter sa partie une fois son travail terminé ( visualisez le sur overleaf.com avant de commit de la marde ).
 
