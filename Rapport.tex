@@ -4,7 +4,7 @@
 \usepackage[french]{babel}
 \usepackage{amsmath, amssymb}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{geometry}
 \geometry{hmargin=2.5cm,vmargin=2.5cm}
 
@@ -19,7 +19,24 @@
 \newpage
 
 \section{Introduction}
-% C'est ta partie ! Tu dois contextualiser le sujet sur les enjeux actuels.
+
+\subsection{Le concept de cascade trophique}
+En écologie, les cascades trophiques sont des cascades qui découlent d'interactions prédateur-proie qui affectent la biomasse ou la productivité de plus d'un niveau au sein d'un réseau trophique. Ce phénomène se produit lorsqu'un prédateur réduit l'abondance ou modifie le comportement de sa proie, ce qui diminue la prédation sur le prochain niveau trophique inférieur. 
+
+\subsection{Enjeux écologiques : L'exemple de Yellowstone}
+Comprendre et modéliser ces dynamiques est aujourd'hui un enjeu majeur pour préserver nos écosystèmes. Les observations faites en Amérique du Nord le montrent bien. L'exemple de Yellowstone est d'ailleurs particulièrement parlant : on s'est rendu compte qu'après la réintroduction des loups en 1995, ces derniers n'ont pas seulement diminué la population de wapitis par la chasse, ils ont carrément modifié leur comportement. Pour se cacher et se protéger, les wapitis ont déserté les vallées. Résultat, la végétation a pu repousser massivement, ce qui illustre parfaitement la notion de contrôle ascendant. Ce retour de la flore a offert de nouvelles ressources aux ours, mais a aussi permis le retour des castors et de nombreuses espèces d'oiseaux. Plus impressionnant encore, les racines des nouveaux arbres ont stabilisé les berges, allant jusqu'à modifier le tracé même des rivières. En résumé, ces exemples concrets sur le terrain nous prouvent que les interactions écologiques sont bien plus intriquées que ce que décrivent les modèles classiques.
+
+\subsection{De la théorie à la réalité de terrain}
+Historiquement, la modélisation mathématique de ces écosystèmes s'appuyait sur les équations canoniques à deux espèces de Lotka-Volterra. Si ces équations capturent l'essence de la prédation avec une élégance remarquable, elles demeurent toutefois insuffisantes pour la prédiction écologique quantitative. 
+
+En réalité, quand on modélise un écosystème réel, on a besoin de méthodes mathématiques plus robustes. Par exemple, on est obligés de prendre en compte la végétation qui exerce un « contrôle ascendant » sur tout le reste : comme la quantité de nourriture disponible dicte directement le nombre d'ongulés que le milieu peut supporter (sa capacité de charge), on se retrouve face à une cascade à trois niveaux trophiques. À cela s'ajoutent d'autres paramètres concrets, comme la compétition entre plusieurs prédateurs pour les mêmes proies (ce qui génère des dynamiques intraguilde), ou encore l'impact de l'homme avec la chasse. Comme cette dernière est saisonnière, elle vient introduire un forçage non autonome dans nos équations. 
+
+\subsection{Objectifs du projet et défis numériques}
+L'objectif de ce projet est donc de formuler, analyser et intégrer numériquement un système biologiquement fondé de cinq équations différentielles ordinaires non linéaires couplées. Ce modèle prendra en compte cinq variables d'état : la végétation, les ongulés principaux, les ongulés secondaires, les loups et les ours. Sur le plan numérique, ce système se caractérise par sa nature raide : ses processus couvrent des échelles de temps très différentes, allant du sous-annuel pour le prélèvement saisonnier, jusqu'au décennal pour la démographie des loups et des ours.
+
+
+
+
 
 \section{Présentation des méthodes numériques}
 % Partie de Thibaud : Les choix de méthodes numériques proposés devront être justifiés.
@@ -28,14 +45,53 @@
 % Partie de Zhouair : Graphes de l'évolution des 5 populations et Scénario Yellowstone.
 
 \section{Conclusion}
-% Ta partie : Synthèse du projet.
+% Partie d'Evrard : Synthèse du projet.
 
 \newpage
 \appendix
 \section{Annexe : Répartition du travail et temps passé}
 % Obligatoire : Indiquer comment le travail a été réparti et une estimation du temps passé par chacun.
 
+Conformément aux attentes du projet, ce travail a fait l'objet d'une répartition précise afin que chaque membre contribue activement et s'approprie l'ensemble des notions abordées au cours du semestre.
+
+\subsection*{Estimation du temps passé par membre}
+
+\textbf{Evrard } : 1h30 au total
+\begin{itemize}
+    \item Prise de connaissance du sujet et des attendus du projet : 15 min
+    \item Planification du projet et définition de la répartition des tâches : 10 min
+    \item Mise en place de l'espace de travail collaboratif (Git et LaTeX) : 30 min
+    \item Rédaction de l'introduction et contextualisation sur LaTeX : 35 min
+\end{itemize}
+
+\vspace{0.5cm}
+\textbf{Romain} : \textit{Temps à compléter...}
+\begin{itemize}
+    \item \textit{Tâches à lister...}
+\end{itemize}
+
+\vspace{0.5cm}
+\textbf{Thibaud} : \textit{Temps à compléter...}
+\begin{itemize}
+    \item \textit{Tâches à lister...}
+\end{itemize}
+
+\vspace{0.5cm}
+\textbf{Zhouair} : \textit{Temps à compléter...}
+\begin{itemize}
+    \item \textit{Tâches à lister...}
+\end{itemize}
+
 \subsection*{Déclaration d'utilisation de l'IA}
 % Le recours à l'IA doit être clairement identifié et ne doit pas dépasser 10% du rendu.
+
+Conformément aux consignes données pour ce projet, nous déclarons avoir eu un recours très partiel à l'Intelligence Artificielle. Son utilisation représente largement moins de 10\% du rendu final et a été strictement cantonnée aux tâches suivantes :
+\begin{itemize}
+    \item Assistance à la configuration de l'environnement de versioning (Git/GitHub), comme autorisé par le sujet.
+    \item Aide à la structuration initiale du document LaTeX et à la planification des tâches.
+\end{itemize}
+
+Le code de résolution numérique, l'implémentation des algorithmes en Python, le choix des paramètres et l'analyse des résultats écologiques sont le fruit exclusif de notre travail de groupe, sans aucune génération par l'IA.
+
 
 \end{document}
