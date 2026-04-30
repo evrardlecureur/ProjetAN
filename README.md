@@ -25,4 +25,3 @@ Modéliser et simuler l'évolution d'un écosystème à 5 populations (Végétat
 * **Thibaud :** X heures
 * **Zhouair :** X heures
 
-**⚠️ Règle d'or de l'équipe :** Même si le travail est divisé, chacun doit comprendre le code et les notions mathématiques abordées !
