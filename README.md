@@ -102,4 +102,4 @@ ne pas tout laisser pour la fin.
 - **Evrard :** 1h30
 - **Romain :** 2h10
 - **Thibaud :** 2h00 — ✅ `euler_implicite`, `runge_kutta_4`, `crank_nicolson` implémentés dans `solvers.py`
-- **Zhouair :** en cours...
+- **Zouhair :** 2h00
