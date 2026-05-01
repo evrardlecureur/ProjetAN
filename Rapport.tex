@@ -14,9 +14,40 @@
 
 \begin{document}
 
-\maketitle
-\tableofcontents
-\newpage
+% ================= PAGE DE GARDE =================
+\begin{titlepage}
+    \thispagestyle{empty}
+
+    \noindent
+    \begin{minipage}{1\textwidth}
+        \includegraphics[width=\linewidth]{pns.png}
+    \end{minipage}
+
+    \vfill
+
+    \begin{center}
+        \rule{\textwidth}{0.8pt}\\[0.8cm]
+        {\Huge \textbf{Projet d'Analyse Numérique}\\[0.4cm]
+        {\LARGE Étude d'une cascade trophique}\\[0.8cm]
+        \rule{\textwidth}{0.8pt}
+    \end{center}
+
+    \vfill
+
+    \begin{center}
+    \begin{minipage}{0.6\textwidth}
+        \centering
+        \textbf{R\'ealis\'e par :}\\[0.3cm]
+        {\Large Evrard, Romain, Thibaud, Zouhair}
+    \end{minipage}
+    \end{center}
+
+    \vfill
+
+    \begin{center}
+     04 Mai 2026
+    \end{center}
+\end{titlepage}
 
 \section{Introduction}
 
@@ -158,9 +189,10 @@ Le code est organisé en quatre modules indépendants :
     \item \texttt{model.py} : implémentation de la fonction $F(t, \mathbf{u})$ retournant
     le vecteur dérivée $[\dot{V}, \dot{N}, \dot{D}, \dot{W}, \dot{B}]$ sous forme de
     tableau NumPy.
-    \item \texttt{solvers.py} : solveurs numériques. La méthode d'Euler explicite
-    ($\mathbf{u}_{n+1} = \mathbf{u}_n + h\, F(t_n, \mathbf{u}_n)$) y est implémentée ;
-    les méthodes supplémentaires (Euler implicite, etc.) y seront ajoutées.
+    \item \texttt{solvers.py} : solveurs numériques. Les quatre schémas sont implémentés :
+    Euler explicite ($\mathbf{u}_{n+1} = \mathbf{u}_n + h\, F(t_n, \mathbf{u}_n)$),
+    Euler implicite, Runge-Kutta 4 et Crank-Nicolson. Les méthodes implicites
+    s'appuient sur un solveur Newton-Raphson vectoriel interne (\texttt{\_newton}).
     \item \texttt{main.py} : point d'entrée. Lance la simulation avec les conditions
     initiales fournies et génère les graphiques des cinq populations.
 \end{itemize}
@@ -298,7 +330,201 @@ explicites. \textbf{RK4} reste la référence de précision pour les pas fins ($
 son ordre 4 assurant une erreur globale bien plus faible qu'Euler explicite à coût comparable.
 
 \section{Présentation des résultats et analyse}
-% Partie de Zhouair : Graphes de l'évolution des 5 populations et Scénario Yellowstone.
+
+Toutes les simulations ont été réalisées avec la méthode RK4 comme référence de
+précision ($h = 0{,}005$ an, sauf indication contraire), et les résultats des quatre
+solveurs ont été systématiquement comparés. Les figures ont été générées par
+\texttt{main.py}.
+
+Pour Euler explicite, ce même pas $h = 0{,}005$~an est retenu (et non $h = 0{,}05$~an
+comme pour les méthodes implicites) afin de respecter la contrainte de stabilité
+conditionnelle. En effet, la condition $|1 + h\lambda| \leq 1$ impose $h \leq
+2/|\lambda_{\max}|$, et les termes non linéaires du système (notamment la
+croissance thêta-logistique avec $\theta_N = 4$) peuvent faire monter les valeurs
+propres effectives bien au-delà de $r_V = 1{,}2$~an$^{-1}$. En pratique, $h = 0{,}01$~an
+est la limite observée empiriquement ; on choisit $h = 0{,}005$~an pour conserver
+une marge de sécurité. Les méthodes A-stables (Euler implicite, Crank-Nicolson)
+n'ont pas cette contrainte et peuvent utiliser $h = 0{,}05$~an — dix fois plus grand —
+sans aucune instabilité.
+
+% ------------------------------------------------------------------ %
+\subsection{Simulation de base sur 50 ans}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{fig1_simulation_base.png}
+    \caption{Évolution des cinq populations sur 50 ans (RK4, $h = 0{,}005$ an $\approx$ 1,8 jour). Les conditions initiales sont $V_0 = 440$ kg·km$^{-2}$, $N_0 = 4{,}5$, $D_0 = 2{,}5$, $W_0 = 0{,}04$, $B_0 = 0{,}25$ animaux·km$^{-2}$.}
+    \label{fig:base}
+\end{figure}
+
+La figure~\ref{fig:base} met en évidence les dynamiques caractéristiques de la cascade
+trophique sur 50 ans.
+
+\paragraph{Végétation ($V$).} Elle part de 440~kg·km$^{-2}$ et se stabilise autour
+de 433,6~kg·km$^{-2}$ en régime quasi-permanent ($t \geq 30$ ans, écart-type
+$\sigma \approx 0{,}50$~kg·km$^{-2}$). Cette valeur, inférieure à la capacité de charge
+maximale $K_V = 500$~kg·km$^{-2}$, traduit un équilibre entre la croissance logistique
+et le pâturage continu des trois herbivores.
+
+\paragraph{Ongulés principaux ($N$, wapitis).} Ils augmentent légèrement de 4,5 à une
+moyenne de 4,62~animaux·km$^{-2}$ en régime établi. La prédation des loups, combinée à
+la mortalité de fond ($\delta_N = 0{,}05$~an$^{-1}$), maintient la population en-dessous
+de la capacité de charge végétation-dépendante $\kappa_N(V) \approx 6{,}7$~animaux·km$^{-2}$.
+
+\paragraph{Ongulés secondaires ($D$, cerfs).} Les cerfs augmentent de 2,5 à environ
+3,04~animaux·km$^{-2}$ en régime quasi-permanent. L'augmentation est plus marquée que pour
+les wapitis car la prédation des loups sur les cerfs (réponse Type II sur $D$, eq.~3) est
+proportionnellement moins intense : les loups concentrent davantage leur effort sur les
+wapitis (prédation ratio-dépendante de grande amplitude, $c_{WN} = 7{,}5$).
+
+\paragraph{Loups ($W$).} Ils partent de 0,04~animaux·km$^{-2}$ et convergent vers une
+moyenne de 0,031~animaux·km$^{-2}$. La densité initiale est légèrement supérieure à l'état
+d'équilibre du système : les loups déclinent donc sur les premières années jusqu'à atteindre
+un niveau compatible avec la biomasse de proies disponible. On observe de surcroît de
+petites oscillations saisonnières ($\sigma \approx 0{,}0012$~animaux·km$^{-2}$) induites par
+le terme de prélèvement humain $\mu_W \sin^2(\pi t)$, dont les pics annuels représentent la
+saison de chasse automnale.
+
+\paragraph{Ours ($B$).} L'ours connaît la dynamique la plus spectaculaire : la
+population quadruple quasiment, passant de 0,25 à une moyenne de 0,77~animaux·km$^{-2}$
+en régime établi (avec de fortes oscillations, $\sigma \approx 0{,}12$). Ce fort accroissement
+s'explique par le caractère omnivore de l'espèce (équation F5) : l'ours bénéficie simultanément
+de la consommation de végétation et de la prédation sur les deux populations d'ongulés. Aucun
+terme de prélèvement humain ne pèse sur lui, contrairement aux loups.
+
+% ------------------------------------------------------------------ %
+\subsection{Comparaison des solveurs numériques}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{fig2_comparaison_solveurs.png}
+    \caption{Comparaison des quatre solveurs sur 50 ans. RK4 ($h = 0{,}005$ an) sert de référence. Euler implicite et Crank-Nicolson utilisent $h = 0{,}05$ an, soit dix fois moins de pas.}
+    \label{fig:solveurs}
+\end{figure}
+
+La figure~\ref{fig:solveurs} montre que les quatre méthodes produisent des trajectoires
+visuellement superposables pour les populations à dynamique lente ($V$, $B$). Les différences
+n'apparaissent significativement que sur les loups, dont les oscillations saisonnières de
+faible amplitude amplifient les erreurs de phase. À $h = 0{,}05$~an, Crank-Nicolson reproduit
+fidèlement la trajectoire RK4, ce qui confirme l'ordre 2 de la méthode et valide le choix de
+ce pas de temps plus grand pour les schémas A-stables. Euler implicite, également A-stable
+mais d'ordre 1 seulement, introduit un léger décalage visible sur les loups.
+
+% ------------------------------------------------------------------ %
+\subsection{Scénario Yellowstone — Réintroduction des loups}
+
+Ce scénario simule la réintroduction de loups dans un écosystème qui en est initialement
+dépourvu, à l'image de l'événement historique du parc de Yellowstone en 1995.
+
+\subsubsection*{Protocole de simulation}
+
+\begin{itemize}
+    \item \textbf{Phase 1} ($t \in [0, 20]$~an) : l'écosystème évolue en l'absence totale
+    de loups ($W = 0$ exactement), modélisant une \emph{extinction} de la population
+    lupine — et non simplement une faible densité. Ce choix est mathématiquement
+    cohérent : puisque $\dot{W} \propto W$ dans l'équation~(F4), l'état $W = 0$ est
+    un équilibre trivial et les loups restent rigoureusement nuls tout au long de la
+    Phase~1 sans qu'aucune correction numérique ne soit nécessaire. C'est précisément
+    cette extinction préalable qui justifie une \emph{réintroduction} active à $t = 20$~ans,
+    par analogie avec la situation historique de Yellowstone où les loups avaient été
+    éradiqués du parc au début du XX\textsuperscript{e} siècle avant d'être réintroduits en 1995.
+    \item \textbf{Phase 2} ($t \in [20, 50]$~an) : on réintroduit $W = 0{,}04$ animaux·km$^{-2}$ (valeur des conditions initiales de la simulation de base) et on reprend l'intégration à partir du dernier état de la Phase~1.
+    \item La simulation de référence (loups présents dès $t = 0$) est superposée pour quantifier l'impact de l'absence prolongée des loups.
+\end{itemize}
+
+\subsubsection*{Résultats et interprétation}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{fig3_yellowstone.png}
+    \caption{Scénario Yellowstone (trait plein) vs. simulation de référence (tirets). La ligne pointillée verticale marque la réintroduction des loups à $t = 20$~ans.}
+    \label{fig:yellow}
+\end{figure}
+
+La figure~\ref{fig:yellow} illustre de façon saisissante la cascade trophique à l'œuvre.
+
+\paragraph{Phase 1 — Écosystème sans prédateur apical.} Sans loups, les wapitis prolifèrent
+sans régulation par prédation : leur densité atteint un maximum de
+$N_{\max} \approx 5{,}63$~animaux·km$^{-2}$ vers $t \approx 6{,}5$~ans (soit $+25\,\%$
+par rapport aux conditions initiales). Ce surnombre de grands herbivores intensifie le pâturage
+et dégrade la végétation, qui descend jusqu'à 422,3~kg·km$^{-2}$ vers $t = 9{,}7$~ans
+($-17{,}3$~kg·km$^{-2}$ par rapport à $V_0$). C'est le mécanisme de \emph{contrôle ascendant}
+(bottom-up) : la réduction de la végétation contraint la capacité de charge effective $\kappa_N(V)$,
+ce qui finit par brider la croissance des wapitis même en l'absence de prédateur. Les ours, eux,
+bénéficient de l'abondance d'ongulés et de végétation et croissent légèrement plus vite qu'en
+référence.
+
+\paragraph{Phase 2 — Réintroduction et réponse de l'écosystème.} L'arrivée des loups à $t = 20$~ans
+induit une réorganisation rapide. Les wapitis sont régulés à la baisse (par prédation directe et
+par l'effet de la \emph{peur} implicite dans la réponse ratio-dépendante), ce qui relâche la pression
+sur la végétation. En régime quasi-permanent ($t \geq 30$~ans), les moyennes comparées sont :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Variable} & \textbf{Référence} & \textbf{Yellowstone} & \textbf{Différence} \\
+\hline
+$V$ (kg·km$^{-2}$) & 433,6 & 436,6 & $+3{,}0$ \\
+$N$ (animaux·km$^{-2}$) & 4,62  & 4,35  & $-0{,}28$ \\
+$D$ (animaux·km$^{-2}$) & 3,04  & 3,02  & $-0{,}01$ \\
+$W$ (animaux·km$^{-2}$) & 0,031 & 0,035 & $+0{,}004$ \\
+$B$ (animaux·km$^{-2}$) & 0,769 & 0,798 & $+0{,}029$ \\
+\hline
+\end{tabular}
+\end{center}
+
+Végétation légèrement plus dense (+3~kg·km$^{-2}$) dans le scénario Yellowstone, car les loups
+réintroduits se trouvent face à des ongulés sur-abondants et exercent d'abord une pression de
+prédation plus forte — ce qui laisse plus de répit à la végétation par rapport au scénario de
+référence où loups et ongulés ont co-évolué depuis $t = 0$. Ces résultats reproduisent qualitativement
+les observations faites à Yellowstone entre 1995 et 2010 : déclin des wapitis, recouvrement de la
+végétation et légère augmentation des ours grizzlis.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{fig4_portraits_phase.png}
+    \caption{Portraits de phase $N$--$W$ et $D$--$W$ pour la simulation de référence (gradient viridis) et le scénario Yellowstone (gradient plasma). Chaque point est coloré selon le temps.}
+    \label{fig:phase}
+\end{figure}
+
+Les portraits de phase (figure~\ref{fig:phase}) montrent que les deux systèmes tendent vers un
+attracteur similaire dans l'espace des états. Dans le scénario Yellowstone, la trajectoire
+présente une discontinuité nette à $t = 20$~ans (transition de couleur) et un transient plus
+étendu avant d'approcher la région d'attraction commune. Le scénario de référence décrit des
+orbites plus régulières dès le départ, confirmant que la dynamique long-terme est robuste à la
+condition initiale des loups.
+
+% ------------------------------------------------------------------ %
+\subsection{Analyse de convergence et ordre des méthodes}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{fig5_convergence.png}
+    \caption{Erreur relative en norme $L^2$ à $T = 10$~ans en fonction du pas $h$, en échelle log-log. La solution de référence est obtenue par RK4 avec $h_{\mathrm{ref}} = 5 \times 10^{-4}$~an.}
+    \label{fig:conv}
+\end{figure}
+
+La figure~\ref{fig:conv} valide empiriquement les ordres théoriques des quatre méthodes.
+
+Les pentes mesurées par régression log-log sur l'ensemble des h testés sont :
+
+\begin{itemize}
+    \item \textbf{Euler explicite} : pente $\approx 0{,}91 \approx 1$ \hfill (théorique : $\mathcal{O}(h)$) \checkmark
+    \item \textbf{Euler implicite} : pente $\approx 1{,}07 \approx 1$ \hfill (théorique : $\mathcal{O}(h)$) \checkmark
+    \item \textbf{Crank-Nicolson} : pente $\approx 3{,}6$ \hfill (théorique : $\mathcal{O}(h^2)$, voir note)
+    \item \textbf{RK4} : pente $\approx 7{,}4$ \hfill (théorique : $\mathcal{O}(h^4)$, voir note)
+\end{itemize}
+
+\paragraph{Note sur Crank-Nicolson et RK4.} Les pentes mesurées sont supérieures aux ordres
+théoriques car, pour les petites valeurs de $h$ (ici $h \leq 0{,}016$~an), les erreurs de
+troncature de ces méthodes d'ordre élevé deviennent si faibles ($< 10^{-8}$ en relatif) qu'elles
+atteignent la zone de \emph{saturation numérique} : les erreurs d'arrondi en virgule flottante
+double précision ($\varepsilon_{\text{machine}} \approx 10^{-16}$) commencent à dominer,
+biaisent la mesure et font apparaître une pente artificielle plus élevée. Ce phénomène est
+attendu et ne remet pas en cause la validité des méthodes. Sur la plage $h \in [0{,}016, 0{,}064]$
+(zone de convergence asymptotique avant saturation), Crank-Nicolson présente une nette
+supériorité sur Euler implicite à coût égal, confirmant l'intérêt de son ordre 2.
 
 \section{Conclusion}
 % Partie d'Evrard : Synthèse du projet.
@@ -343,9 +569,15 @@ Conformément aux attentes du projet, ce travail a fait l'objet d'une répartiti
 \end{itemize}
 
 \vspace{0.5cm}
-\textbf{Zhouair} : \textit{Temps à compléter...}
+\textbf{Zouhair} : 3h30
 \begin{itemize}
-    \item \textit{Tâches à lister...}
+    \item Lecture du sujet et analyse des attentes : 10 min
+    \item Prise en main de l'architecture Python : 8 min
+    \item Implémentation simulation + Figures 1 et 2 : 15 min
+    \item Scénario Yellowstone + Figures 3 et 4 : 25 min
+    \item Analyse de convergence + Figure 5 : 20 min
+    \item Rédaction des résultats et analyse : 22 min
+    \item Réalisation de la présentation : 20 min
 \end{itemize}
 
 \subsection*{Déclaration d'utilisation de l'IA}
@@ -361,3 +593,4 @@ Le code de résolution numérique, l'implémentation des algorithmes en Python, 
 
 
 \end{document}
+
