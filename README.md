@@ -1,7 +1,7 @@
 # Projet d'Analyse Numérique : Étude d'une Cascade Trophique
 
 Bienvenue sur le dépôt de notre projet d'Analyse Numérique (2025-2026).  
-**Équipe :** Evrard, Romain, Thibaud, et Zhouair.
+**Équipe :** Evrard, Romain, Thibaud, et Zouhair.
 
 ## Objectif du Projet
 
@@ -29,7 +29,7 @@ ProjetAN/
     ├── params.py     ← [ROMAIN] tous les paramètres du modèle (tableau p.7 du sujet)
     ├── model.py      ← [ROMAIN] fonction F(t, u) : les 5 EDO du système
     ├── solvers.py    ← [ROMAIN] Euler explicite  |  [THIBAUD] Euler implicite + autres
-    └── main.py       ← [ROMAIN] point d'entrée   |  [ZHOUAIR] simulations & graphiques
+    └── main.py       ← [ROMAIN] point d'entrée   |  [ZOUHAIR] simulations & graphiques
 
 > **Règle d'or :** chacun travaille dans son périmètre et ne réécrit pas le travail des autres.
 
@@ -40,7 +40,7 @@ ProjetAN/
 markdown# Projet d'Analyse Numérique : Étude d'une Cascade Trophique
 
 Bienvenue sur le dépôt de notre projet d'Analyse Numérique (2025-2026).  
-**Équipe :** Evrard, Romain, Thibaud, et Zhouair.
+**Équipe :** Evrard, Romain, Thibaud, et Zouhair.
 
 ## Objectif du Projet
 
@@ -80,7 +80,7 @@ ProjetAN/
 | **1** | **Evrard** | **Chef de Projet & Rédac Chef :** Initialisation du Git, coordination, gestion du README et recherches documentaires. | Rédaction de l'Introduction (enjeux actuels), de la Conclusion, et de l'Annexe (répartition et temps passé). |
 | **2** | **Romain** | **Tech Lead :** Création de l'architecture Python. Implémentation stricte du système des 5 EDO et des paramètres fournis. | Documentation claire du code pour le groupe et explication de la modélisation mathématique. |
 | **3** | **Thibaud** | **Analyste Numérique :** Programmation du cœur mathématique. Implémentation du solveur avec la méthode d'Euler implicite. | Rédaction de la section "Présentation et justification des méthodes numériques" (justification face au système raide). |
-| **4** | **Zhouair** | **Écologue Modélisateur :** Exécution des simulations de base. Création et simulation du scénario "Yellowstone", génération des graphiques. | Rédaction de la section "Résultats et analyse" et préparation des slides pour la soutenance de 10 minutes. |
+| **4** | **Zouhair** | **Écologue Modélisateur :** Exécution des simulations de base. Création et simulation du scénario "Yellowstone", génération des graphiques. | Rédaction de la section "Résultats et analyse" et préparation des slides pour la soutenance de 10 minutes. |
 
 ---
 
