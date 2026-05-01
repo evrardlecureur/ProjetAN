@@ -35,6 +35,135 @@ En réalité, quand on modélise un écosystème réel, on a besoin de méthodes
 L'objectif de ce projet est donc de formuler, analyser et intégrer numériquement un système biologiquement fondé de cinq équations différentielles ordinaires non linéaires couplées. Ce modèle prendra en compte cinq variables d'état : la végétation, les ongulés principaux, les ongulés secondaires, les loups et les ours. Sur le plan numérique, ce système se caractérise par sa nature raide : ses processus couvrent des échelles de temps très différentes, allant du sous-annuel pour le prélèvement saisonnier, jusqu'au décennal pour la démographie des loups et des ours.
 
 
+\section{Modélisation mathématique et implémentation}
+
+\subsection{Variables d'état}
+
+Le système modélise l'évolution temporelle de cinq populations au sein d'un écosystème.
+Le temps $t$ est mesuré en années. Le vecteur d'état est :
+
+\[
+\mathbf{u}(t) = \bigl(V(t),\, N(t),\, D(t),\, W(t),\, B(t)\bigr)^\top \in \mathbb{R}^5_{>0}
+\]
+
+où $V$ désigne la densité de biomasse végétale (kg·km$^{-2}$), $N$ la densité des ongulés
+principaux (wapitis/orignaux, animaux·km$^{-2}$), $D$ la densité des ongulés secondaires
+(cerfs, animaux·km$^{-2}$), $W$ la densité de loups (animaux·km$^{-2}$) et $B$ la densité
+d'ours (animaux·km$^{-2}$).
+
+\subsection{Termes de prédation}
+
+Avant d'écrire le système complet, on introduit les fonctions de prédation qui apparaissent
+de manière répétée dans les équations.
+
+\paragraph{Prédation des loups sur les wapitis — réponse dépendante du ratio (Type II-R).}
+Contrairement aux modèles classiques où le taux de prédation dépend uniquement de la densité
+de proies, les données empiriques d'Isle Royale et de Yellowstone montrent que c'est le
+\emph{ratio} prédateurs/proies qui gouverne la mise à mort :
+
+\[
+f_{WN}(N, W) = \frac{c_{WN}\, N}{W + \beta N}
+\]
+
+Quand les loups sont très nombreux ($W \gg \beta N$), chaque loup tue proportionnellement
+au nombre de proies disponibles par prédateur. Quand les proies dominent ($\beta N \gg W$),
+le taux sature à $c_{WN}/\beta$.
+
+\paragraph{Prédation des loups sur les cerfs — réponse Type II proie-dépendante.}
+\[
+f_{WD}(D) = \frac{c_{WD}\, D}{h_{WD} + D}
+\]
+
+\paragraph{Prédation des ours — réponse Type II sur les deux ongulés.}
+\[
+f_{BN}(N) = \frac{c_{BN}\, N}{h_{BN} + N}, \qquad f_{BD}(D) = \frac{c_{BD}\, D}{h_{BD} + D}
+\]
+
+\paragraph{Taux total de mise à mort par loup.}
+Ce terme agrège la prédation sur les deux types d'ongulés et intervient dans la réponse
+numérique des loups :
+\[
+\Phi_W(N, D, W) = f_{WN}(N,W) + f_{WD}(D)
+\]
+
+\paragraph{Capacité de charge dépendante de la végétation.}
+La quantité de nourriture disponible dicte directement combien d'ongulés le milieu peut
+supporter. On modélise cette dépendance par une saturation de type Monod :
+\[
+\kappa_N(V) = K_N \frac{V}{V^\star + V}, \qquad \kappa_D(V) = K_D \frac{V}{V^{\star\star} + V}
+\]
+Quand $V \to 0$, la capacité de charge tend vers 0 (famine). Quand $V \to \infty$, elle
+tend vers la capacité maximale intrinsèque $K_N$ (ou $K_D$). Les seuils $V^\star$ et
+$V^{\star\star}$ diffèrent car wapitis et cerfs exploitent des strates de végétation
+différentes.
+
+\subsection{Système d'équations différentielles}
+
+Le système complet $\dot{\mathbf{u}} = F(t, \mathbf{u})$ est le suivant.
+
+\paragraph{Végétation (F1).}
+\[
+\frac{dV}{dt} = r_V V\!\left(1 - \frac{V}{K_V}\right)
+- \frac{\alpha_N V N}{\nu_N + V}
+- \frac{\alpha_D V D}{\nu_D + V}
+- \frac{\alpha_B V B}{\nu_B + V}
+\]
+La végétation suit une croissance logistique, freinée par le pâturage des trois herbivores
+selon des réponses de Holling Type II.
+
+\paragraph{Ongulés principaux (F2).}
+\[
+\frac{dN}{dt} = r_N N\!\left[1 - \left(\frac{N}{\kappa_N(V)}\right)^{\theta_N}\right]
+- f_{WN} W - f_{BN} B - \delta_N N
+\]
+La croissance est régie par un modèle thêta-logistique de Gilpin-Ayala. Avec $\theta_N = 4$,
+la régulation par la capacité de charge est bien plus brutale qu'avec le modèle logistique
+standard ($\theta = 1$) : la population est peu contrainte loin de $\kappa_N$, mais freinée
+très fortement à son approche.
+
+\paragraph{Ongulés secondaires (F3).}
+\[
+\frac{dD}{dt} = r_D D\!\left[1 - \left(\frac{D}{\kappa_D(V)}\right)^{\theta_D}\right]
+- f_{WD} W - f_{BD} B - \delta_D D
+\]
+
+\paragraph{Loups (F4).}
+\[
+\frac{dW}{dt} = \Bigl[\varepsilon_1 \ln(\Phi_W + \eta) - \varepsilon_2\Bigr] W
+- m_W W - \mu_W \sin^2(\pi t)\, W
+\]
+Le taux de croissance individuel des loups $r_W = \varepsilon_1 \ln(\Phi_W + \eta) - \varepsilon_2$
+est une réponse numérique logarithmique (Vucetich et al. 2011) : la relation entre apport
+alimentaire et reproduction est concave (saturante), ce qui est absent des modèles
+classiques de Lotka-Volterra. Le paramètre $\eta > 0$ évite la divergence du logarithme
+quand $\Phi_W \to 0$. Le terme $\mu_W \sin^2(\pi t)$ introduit un forçage saisonnier
+non autonome de période $T = 1$ an, avec des pics en $t = 0{,}5,\, 1{,}5, \ldots$
+représentant la saison de chasse automnale.
+
+\paragraph{Ours (F5).}
+\[
+\frac{dB}{dt} = \left[e_B\!\left(f_{BN} + f_{BD}\right)
++ \frac{e_V \alpha_B V}{\nu_B + V} - m_B\right] B
+\]
+Les ours sont omnivores : leur taux de croissance individuel combine la prédation des
+ongulés et la consommation directe de végétation (baies, racines, tubercules).
+
+\subsection{Architecture de l'implémentation Python}
+
+Le code est organisé en quatre modules indépendants :
+
+\begin{itemize}
+    \item \texttt{params.py} : déclaration de l'ensemble des paramètres du modèle
+    (valeurs du tableau page 7 du sujet) et des conditions initiales.
+    \item \texttt{model.py} : implémentation de la fonction $F(t, \mathbf{u})$ retournant
+    le vecteur dérivée $[\dot{V}, \dot{N}, \dot{D}, \dot{W}, \dot{B}]$ sous forme de
+    tableau NumPy.
+    \item \texttt{solvers.py} : solveurs numériques. La méthode d'Euler explicite
+    ($\mathbf{u}_{n+1} = \mathbf{u}_n + h\, F(t_n, \mathbf{u}_n)$) y est implémentée ;
+    les méthodes supplémentaires (Euler implicite, etc.) y seront ajoutées.
+    \item \texttt{main.py} : point d'entrée. Lance la simulation avec les conditions
+    initiales fournies et génère les graphiques des cinq populations.
+\end{itemize}
 
 
 
