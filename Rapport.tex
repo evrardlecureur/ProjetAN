@@ -168,7 +168,134 @@ Le code est organisé en quatre modules indépendants :
 
 
 \section{Présentation des méthodes numériques}
-% Partie de Thibaud : Les choix de méthodes numériques proposés devront être justifiés.
+
+\subsection{Raideur du système et contraintes numériques}
+
+Avant de choisir une méthode d'intégration, il est indispensable de caractériser la
+\emph{raideur} du système. Un système d'EDO est dit raide lorsque ses valeurs propres
+de jacobien couvrent plusieurs ordres de grandeur : certains processus évoluent très vite
+(ici la végétation et le forçage saisonnier annuel des loups, $T = 1$ an), d'autres très
+lentement (la démographie des loups et des ours, échelle décennale). Cette hétérogénéité
+d'échelles impose une contrainte de stabilité sévère aux méthodes explicites.
+
+Pour une méthode explicite d'ordre 1 comme Euler, la condition de stabilité s'écrit
+$|1 + h\lambda| \leq 1$ pour toute valeur propre $\lambda$ du jacobien. Si la plus grande
+valeur propre est de l'ordre de $|\lambda_{\max}| \approx r_V = 1{,}2$ an$^{-1}$, la
+condition impose $h \leq 2/|\lambda_{\max}| \approx 1{,}67$ an. En pratique, les termes non
+linéaires (croissance thêta-logistique avec $\theta_N = 4$, réponse ratio-dépendante)
+peuvent générer des valeurs propres effectivement bien plus grandes près des équilibres,
+ce qui oblige à choisir $h \leq 0{,}01$ an (environ 3,6 jours) pour garantir la stabilité
+d'Euler explicite sur 50 ans. Les méthodes implicites, inconditionnellement stables
+(\emph{A-stables}), lèvent cette contrainte.
+
+\subsection{Les méthodes implémentées}
+
+Quatre solveurs ont été implémentés dans \texttt{solvers.py}. Ils partagent tous la même
+interface : \texttt{solveur(F, u0, t0, tf, h)} et retournent le couple
+\texttt{(t\_values, U)}.
+
+\subsubsection{Méthode d'Euler explicite}
+
+\[
+\mathbf{u}_{n+1} = \mathbf{u}_n + h\, F(t_n, \mathbf{u}_n)
+\]
+
+C'est le schéma le plus simple : la dérivée est évaluée au point courant $t_n$ et l'on
+avance d'un pas $h$. L'erreur de troncature locale est en $\mathcal{O}(h^2)$, ce qui
+confère à la méthode un ordre global 1. Elle est conditionnellement stable : sur notre
+système, $h = 0{,}01$ an est nécessaire (soit 5\,001 pas pour une simulation de 50 ans).
+Cette méthode sert de référence de base et de prédicteur pour les schémas implicites.
+
+\subsubsection{Méthode de Runge-Kutta d'ordre 4 (RK4)}
+
+\[
+\begin{aligned}
+k_1 &= F(t_n,\; \mathbf{u}_n) \\
+k_2 &= F\!\left(t_n + \tfrac{h}{2},\; \mathbf{u}_n + \tfrac{h}{2} k_1\right) \\
+k_3 &= F\!\left(t_n + \tfrac{h}{2},\; \mathbf{u}_n + \tfrac{h}{2} k_2\right) \\
+k_4 &= F(t_n + h,\; \mathbf{u}_n + h\, k_3) \\[4pt]
+\mathbf{u}_{n+1} &= \mathbf{u}_n + \frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4)
+\end{aligned}
+\]
+
+RK4 est une méthode explicite à 4 étages d'ordre global 4 : l'erreur de troncature
+locale est en $\mathcal{O}(h^5)$. Pour un coût de 4 évaluations de $F$ par pas (contre 1
+pour Euler), elle permet d'utiliser des pas bien plus grands tout en conservant une
+précision nettement supérieure. Elle est utilisée ici comme \emph{référence de précision}
+pour valider les schémas implicites. Notons qu'elle reste conditionnellement stable (le
+domaine de stabilité de RK4 sur l'axe réel négatif s'étend jusqu'à $h|\lambda| \leq 2{,}79$),
+mais cette contrainte est bien moins restrictive que pour Euler explicite.
+
+\subsubsection{Méthode d'Euler implicite}
+
+\[
+\mathbf{u}_{n+1} = \mathbf{u}_n + h\, F(t_{n+1}, \mathbf{u}_{n+1})
+\]
+
+Contrairement au schéma explicite, la dérivée est évaluée au point \emph{futur}
+$t_{n+1}$. Ce décalage confère au schéma une stabilité inconditionnelle (\emph{A-stable}) :
+quelle que soit la valeur du pas $h$, la méthode ne diverge pas numériquement. En
+contrepartie, chaque pas requiert la résolution du système non linéaire :
+
+\[
+G(\mathbf{u}_{n+1}) = \mathbf{u}_{n+1} - \mathbf{u}_n - h\, F(t_{n+1}, \mathbf{u}_{n+1}) = 0
+\]
+
+Ce système est résolu par la méthode de \textbf{Newton-Raphson}, implémentée à la main
+dans la fonction auxiliaire \texttt{\_newton(G, u\_guess)}. À chaque itération, le
+jacobien de $G$ est approché colonne par colonne par \textbf{différences finies centrées} :
+
+\[
+J_{:,j} \approx \frac{G(\mathbf{u} + \varepsilon\, \mathbf{e}_j) - G(\mathbf{u} - \varepsilon\, \mathbf{e}_j)}{2\varepsilon},
+\qquad \varepsilon = \sqrt{\varepsilon_{\text{machine}}} \approx 1{,}49 \times 10^{-8}
+\]
+
+où $\mathbf{e}_j$ est le $j$-ième vecteur de la base canonique de $\mathbb{R}^5$. On
+résout ensuite le système linéaire $J\,\delta = -G(\mathbf{u})$ par élimination gaussienne
+(\texttt{numpy.linalg.solve}), puis l'on met à jour $\mathbf{u} \leftarrow \mathbf{u} +
+\delta$ jusqu'à convergence ($\|G(\mathbf{u})\| < 10^{-10}$). Le point de départ de Newton
+est le prédicteur Euler explicite $\mathbf{u}_n + h\, F(t_n, \mathbf{u}_n)$, qui assure
+une bonne initialisation et une convergence rapide (3 à 6 itérations en pratique).
+
+\subsubsection{Méthode de Crank-Nicolson}
+
+\[
+\mathbf{u}_{n+1} = \mathbf{u}_n + \frac{h}{2}\Bigl[F(t_n, \mathbf{u}_n) + F(t_{n+1}, \mathbf{u}_{n+1})\Bigr]
+\]
+
+La méthode de Crank-Nicolson (ou règle du trapèze implicite) est une méthode d'ordre 2,
+A-stable, symétrique en temps. Elle peut être interprétée comme la moyenne des schémas
+d'Euler explicite et implicite, ce qui explique à la fois sa stabilité inconditionnelle
+(héritée d'Euler implicite) et sa précision au second ordre (contre l'ordre 1 d'Euler
+implicite). Comme pour Euler implicite, chaque pas nécessite la résolution d'un système
+non linéaire via notre Newton-Raphson. Le terme $F(t_n, \mathbf{u}_n)$ est calculé une
+seule fois en dehors de la boucle Newton et capturé dans la closure de $G$.
+
+\subsection{Comparaison et justification des choix}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Méthode} & \textbf{Ordre} & \textbf{Stabilité} & \textbf{Évals. $F$/pas} & \textbf{$h$ recommandé} \\
+\hline
+Euler explicite    & 1 & Conditionnelle & 1    & $\leq 0{,}01$ an \\
+RK4                & 4 & Conditionnelle & 4    & $\leq 0{,}05$ an \\
+Euler implicite    & 1 & A-stable       & $\sim 20^*$ & $\leq 0{,}10$ an \\
+Crank-Nicolson     & 2 & A-stable       & $\sim 20^*$ & $\leq 0{,}10$ an \\
+\hline
+\end{tabular}
+\caption{Comparaison des quatre solveurs implémentés. (*) $\approx 4n$ évaluations de $F$
+par itération Newton, avec $n=5$ variables et $\sim$4 itérations en pratique.}
+\end{table}
+
+Sur notre système, la \textbf{méthode de Crank-Nicolson} offre le meilleur compromis :
+stabilité inconditionnelle et ordre 2, permettant d'utiliser $h = 0{,}05$ an (20 pas par
+an) sans instabilité. Par comparaison, Euler implicite — bien que stable — ne gagne en
+précision qu'en réduisant $h$, ce qui annule l'avantage de coût face aux méthodes
+explicites. \textbf{RK4} reste la référence de précision pour les pas fins ($h \leq 0{,}01$),
+son ordre 4 assurant une erreur globale bien plus faible qu'Euler explicite à coût comparable.
 
 \section{Présentation des résultats et analyse}
 % Partie de Zhouair : Graphes de l'évolution des 5 populations et Scénario Yellowstone.
@@ -205,9 +332,14 @@ Conformément aux attentes du projet, ce travail a fait l'objet d'une répartiti
 \end{itemize}
 
 \vspace{0.5cm}
-\textbf{Thibaud} : \textit{Temps à compléter...}
+\textbf{Thibaud} : 2h00
 \begin{itemize}
-    \item \textit{Tâches à lister...}
+    \item Lecture du sujet, analyse de la raideur du système et choix des méthodes numériques : 20 min
+    \item Implémentation du solveur Newton-Raphson avec jacobien par différences finies centrées (\texttt{\_newton}) : 30 min
+    \item Implémentation d'Euler implicite dans \texttt{solvers.py} : 20 min
+    \item Implémentation de Runge-Kutta 4 dans \texttt{solvers.py} : 15 min
+    \item Implémentation de Crank-Nicolson dans \texttt{solvers.py} : 20 min
+    \item Rédaction de la section ``Présentation des méthodes numériques'' : 15 min
 \end{itemize}
 
 \vspace{0.5cm}
