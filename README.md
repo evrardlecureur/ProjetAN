@@ -41,7 +41,7 @@ Pour la soutenance il est important que tout le monde comprenne l'ensemble du pr
 ---
 
 ## Suivi du temps de travail (Validé)
-* **Evrard :** 1h30
+* **Evrard :** 1h50
 * **Romain :** 2h10
 * **Thibaud :** 2h00
-* **Zouhair :** 3h30
+* **Zouhair :** 2h00
