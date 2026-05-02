@@ -16,6 +16,7 @@ Pour la soutenance il est important que tout le monde comprenne l'ensemble du pr
 * `README.md` : Ce fichier de documentation.
 * `Rapport.tex` : Rapport final LaTeX (chacun complète sa section).
 * `main.pdf` : Sujet du projet.
+* `soutenance.pdf`: Slides
 * `photos_rapport/`
 * `code/`
   * `params.py` : [ROMAIN] Tous les paramètres du modèle et conditions initiales.
