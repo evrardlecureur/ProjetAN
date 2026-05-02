@@ -1,4 +1,4 @@
-# Projet d'Analyse Numérique : Étude d'une Cascade Trophique
+# Projet d'Analyse Numérique
  
 **Équipe :** Evrard, Romain, Thibaud, Zouhair.
 
