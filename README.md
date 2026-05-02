@@ -1,17 +1,17 @@
 # Projet d'Analyse Numérique : Étude d'une Cascade Trophique
  
-**Équipe :** Evrard, Romain, Thibaud, et Zouhair.
+**Équipe :** Evrard, Romain, Thibaud, Zouhair.
 
 ## Objectif du Projet
 Modéliser et simuler l'évolution d'un écosystème à 5 populations (Végétation, Wapitis/Orignaux, Cerfs, Loups, Ours) en résolvant numériquement un système de 5 EDO non linéaires couplées.
 
-## 🚨 AVERTISSEMENT IMPORTANT POUR TOUTE L'ÉQUIPE 🚨
+## ⚠️⚠️⚠️⚠️ 
 **Avant de taper la moindre ligne de code, lisez le PDF du sujet (`main.pdf`) en entier !**  
 Pour la soutenance il est important que tout le monde comprenne l'ensemble du projet. La soutenance compte pour beaucoup dans la note...
 
 ---
 
-## 📂 Architecture du projet
+## Architecture du projet
 `ProjetAN/`
 * `README.md` : Ce fichier de documentation.
 * `Rapport.tex` : Rapport final LaTeX (chacun complète sa section).
@@ -26,7 +26,7 @@ Pour la soutenance il est important que tout le monde comprenne l'ensemble du pr
 
 ---
 
-## 📋 Répartition du Projet 
+## Répartition du Projet 
 
 | Étape | Membre | Rôle & Tâches Principales | Livrables |
 | :---: | :--- | :--- | :--- |
@@ -37,7 +37,7 @@ Pour la soutenance il est important que tout le monde comprenne l'ensemble du pr
 
 ---
 
-## ⏱️ Suivi du temps de travail (Validé)
+## Suivi du temps de travail (Validé)
 * **Evrard :** 1h30
 * **Romain :** 2h10
 * **Thibaud :** 2h00
