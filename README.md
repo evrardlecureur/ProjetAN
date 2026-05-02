@@ -16,11 +16,13 @@ Pour la soutenance il est important que tout le monde comprenne l'ensemble du pr
 * `README.md` : Ce fichier de documentation.
 * `Rapport.tex` : Rapport final LaTeX (chacun complète sa section).
 * `main.pdf` : Sujet du projet.
+* `photos_rapport/`
 * `code/`
   * `params.py` : [ROMAIN] Tous les paramètres du modèle et conditions initiales.
   * `model.py` : [ROMAIN] Fonction F(t, u) contenant les 5 EDO du système.
   * `solvers.py` : [ROMAIN & THIBAUD] Solveurs numériques (Euler explicite, implicite, RK4, Crank-Nicolson).
   * `main.py` : [ZOUHAIR] Point d'entrée, exécution des simulations et génération des graphiques.
+  
 
 > **Important :** Chacun travaille dans son périmètre et ne réécrit pas le travail des autres. Ce README est a mettre à jour à chacune de nos contributions. 
 
