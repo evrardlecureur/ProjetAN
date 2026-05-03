@@ -16,13 +16,13 @@
 
 *[SLIDE 1 — Titre]*
 
-Bonjour à tous.
+Bonjour à tous. Aujourd'hui, Romain, Thibaud, Zouhair et moi-même allons vous présenter notre projet d'analyse numérique. On a travaillé sur la modélisation d'une cascade trophique.
 
-Nous présentons notre projet d'Analyse Numérique sur la modélisation d'une cascade trophique. Notre équipe : Evrard, Romain, Thibaud et Zouhair.
+Concrètement, on avait deux grands objectifs. Le premier, c'était de réussir à coder et à résoudre un système complexe de 5 équations différentielles. Ces équations, elles représentent 5 espèces qui interagissent : la végétation, les wapitis, les cerfs, les loups et les ours.
 
-L'objectif central du projet est double. D'abord, résoudre numériquement un système de cinq équations différentielles ordinaires non linéaires représentant l'évolution de cinq populations en interaction — végétation, wapitis, cerfs, loups et ours. Ensuite, étudier l'impact d'une réintroduction de loups dans cet écosystème, en s'inspirant de ce qui s'est passé à Yellowstone en 1995.
+Notre deuxième objectif, c'était d'utiliser ce modèle mathématique pour simuler un événement écologique réel : la fameuse réintroduction des loups dans le parc de Yellowstone en 1995.
 
-La structure de notre présentation suit le pipeline du projet : contexte biologique, modélisation mathématique, implémentation numérique, et résultats.
+Pour vous expliquer tout ça, on va suivre le déroulé logique de notre travail : d'abord le contexte biologique, ensuite les maths, puis notre code, et enfin l'analyse de nos résultats.
 
 ---
 
@@ -30,13 +30,21 @@ La structure de notre présentation suit le pipeline du projet : contexte biolog
 
 *[SLIDE 2 — Contexte]*
 
-Une cascade trophique, c'est l'idée qu'un prédateur ne régule pas seulement ses proies directes — son effet se propage à travers tout le réseau trophique, jusqu'à la végétation.
+Pour commencer, c'est quoi une cascade trophique ? En fait, c'est l'idée qu'un super-prédateur, comme le loup, ne fait pas que manger ses proies. Son impact redescend « en cascade » sur tout le reste de l'écosystème, jusqu'à modifier la végétation.
 
-Des études de terrain de long terme — notamment à **Isle Royale avec 41 ans de données loups-orignaux continues**, et à Yellowstone depuis la réintroduction des loups en 1995 — ont révélé des dynamiques bien plus riches que les équations classiques de Lotka-Volterra.
+On le sait grâce à des observations de très long terme sur le terrain. Et ces données nous ont prouvé que les équations de prédation classiques qu'on voit en cours, comme Lotka-Volterra, ne suffisaient pas pour la vraie vie.
 
-Trois observations de terrain qui structurent directement notre modèle. Premièrement, la prédation des loups sur les grands ongulés suit une **réponse fonctionnelle dépendante du ratio** : le taux de mise à mort dépend du rapport prédateurs/proies et non de la densité des proies seule. C'est un résultat empirique, confirmé indépendamment sur Isle Royale et Yellowstone. Deuxièmement, la régulation des ongulés suit un modèle **thêta-logistique de Gilpin-Ayala** avec θ ≈ 4 — la régulation est bien plus abrupte qu'un modèle logistique standard à proximité de la capacité de charge. Troisièmement, la réponse numérique des loups — leur taux de croissance en fonction de leur taux de mise à mort — est **concave et logarithmique** : manger plus apporte de moins en moins de bénéfice reproductif.
+Pour que notre modèle soit réaliste, on a dû y intégrer trois vrais comportements de terrain :
 
-Et ce système est **raide**. Il couvre des échelles de temps allant du sub-annuel — le forçage saisonnier de la chasse, période T = 1 an — au décennal pour les ours et les loups. C'est précisément cette raideur qui justifie de comparer nos méthodes numériques, et c'est le cœur mathématique du projet.
+L'appétit des loups dépend du ratio entre le nombre de loups et de proies, pas juste du nombre de proies disponibles.
+
+La croissance des herbivores suit un modèle thêta-logistique. C'est un grand mot pour dire que tant qu'il y a de la nourriture, ils se reproduisent très vite, mais dès qu'on atteint la limite du milieu, la régulation est brutale.
+
+Chez les loups, la croissance est logarithmique : manger deux fois plus de wapitis ne veut pas dire qu'ils feront deux fois plus de petits. Le bénéfice finit par saturer.
+
+Quand on met tout ça ensemble, on obtient un système mathématiquement très « raide ». Pourquoi ? Parce qu'on mélange des choses qui évoluent très vite, comme le cycle annuel des saisons, avec des choses très lentes, comme la démographie des ours qui prend des dizaines d'années.
+
+C'est exactement cette différence d'échelles qui a rendu la résolution numérique difficile. Et Romain va justement vous présenter nos équations de plus près.
 
 ---
 
@@ -92,12 +100,16 @@ Avant de les présenter, un mot sur la raideur. Un système est raide quand son 
 
 *[SLIDE 6 — Architecture]*
 
-Le code est organisé en quatre modules avec une séparation claire des responsabilités.
+Avant de passer aux résultats, je vous fais un point rapide sur la structure de notre code Python. En tant que chef de projet, j'ai tenu à ce qu'on ait une architecture vraiment propre, divisée en 4 fichiers distincts.
 
-`params.py` concentre tous les paramètres et conditions initiales — une seule source de vérité, importée par les autres modules. `model.py` implémente la fonction F(t,u) avec les cinq équations. `solvers.py` contient les quatre solveurs et le Newton-Raphson vectoriel utilisé par les méthodes implicites. Et `main.py` orchestre les trois blocs de simulation : la simulation de base, le scénario Yellowstone, et l'analyse de convergence.
+D'abord, params.py : c'est notre dictionnaire. Il contient toutes les constantes et nos valeurs de départ. Si on veut changer un paramètre pour tester autre chose, on le fait là et ça met tout à jour d'un coup.
+Ensuite, model.py : c'est ici qu'on a codé notre système des 5 équations.
+Puis, le fichier solvers.py : c'est notre moteur mathématique, avec nos quatre méthodes d'intégration et l'algorithme de Newton.
+Et enfin, main.py : c'est le chef d'orchestre qui lance les calculs et génère nos graphiques.
 
-La répartition du travail est dans le tableau — chaque membre avait un périmètre délimité pour éviter les conflits.
+Comme vous pouvez le voir sur le tableau, on a divisé le travail intelligemment pour que chacun ait son propre périmètre et qu'on ne se marche pas dessus lors de nos fusions sur Git.
 
+Et justement, Zouhair va maintenant vous montrer ce que ce code a produit concrètement.
 ---
 
 ## SLIDE 7 — Simulation de Référence — *Zouhair*
@@ -201,12 +213,13 @@ Le coût par pas : environ 30 à 60 évaluations de F, contre 4 pour RK4. C'est 
 ## SLIDE 13 — Conclusion — *Evrard*
 
 *[SLIDE 13 — Conclusion]*
+Pour conclure... Notre projet partait d'une vraie question d'écologie : que se passe-t-il quand on réintroduit un super-prédateur dans un milieu qui n'en a pas vu depuis 20 ans ?
 
-Ce projet partait d'une question biologique : que se passe-t-il quand on réintroduit un prédateur apical dans un écosystème qui en est privé depuis 20 ans ? Pour y répondre, il fallait un modèle mathématique réaliste, des solveurs capables de gérer la raideur, et une validation rigoureuse des méthodes. Les trois sont là.
+Pour y répondre sans faire exploser notre code, on a compris qu'il nous fallait un modèle robuste, et surtout, les bonnes méthodes numériques. Mathématiquement, la vraie leçon qu'on en tire, c'est qu'utiliser Euler implicite ou Crank-Nicolson, ce n'est pas qu'un détail technique pour faire joli. Face à un système aussi « raide », c'est une obligation. Sans ces méthodes stables, le temps de calcul aurait été insoutenable.
 
-Le résultat numérique qu'on retient : sur un système raide, la stabilité inconditionnelle d'Euler implicite et de Crank-Nicolson n'est pas un détail technique — c'est ce qui permet d'observer la dynamique décennale des ours sans être contraint par le pas de temps sub-annuel de la saison de chasse. Le rapport d'échelles est de 100. Sans méthodes A-stables, on ne peut pas explorer ce système efficacement.
+Et sur le plan écologique, le modèle nous a confirmé une chose fascinante : réintroduire le loup, ça ne remet pas simplement les compteurs à zéro. La nature a une mémoire. Après 20 ans de prolifération des herbivores, l'écosystème est profondément abîmé. La cascade trophique que l'on déclenche est donc beaucoup plus abrupte que si le loup n'était jamais parti.
 
-Et écologiquement : réintroduire les loups après 20 ans d'absence ne remet pas le système à l'état initial. L'écosystème **garde la mémoire de ces 20 ans** — les wapitis sont encore plus nombreux, la végétation plus dégradée, et la cascade trophique qui s'enclenche est plus abrupte que dans la simulation de référence. C'est ce que le modèle prédit, et c'est qualitativement cohérent avec les observations de Yellowstone.
+C'est exactement ce que nos mathématiques ont prédit, et c'est ce que les biologistes ont réellement pu observer sur le terrain à Yellowstone.
 
 Merci pour votre attention. Nous sommes prêts pour vos questions.
 
