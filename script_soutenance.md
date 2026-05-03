@@ -186,7 +186,7 @@ Un point important : **le système ne revient pas à l'état initial**. Il garde
 
 Les portraits de phase permettent de visualiser la **trajectoire de l'écosystème dans l'espace des états** — ce que le graphe temporel ne montre pas. La figure a quatre panneaux : deux pour la simulation de référence, deux pour le scénario Yellowstone.
 
-**Référence N–W** : spirale amortie vers un attracteur. Oscillations loups-wapitis de type Lotka-Volterra, période ≈ 10 ans. Le système converge vers un point fixe stable vers t = 40 ans.
+**Référence N–W** : le plan N-W montre une spirale amortie vers un attracteur — typique d'un système proie-prédateur à oscillations amorties. Le système converge vers un point fixe stable vers t = 40 ans, il n'oscille pas indéfiniment. Le gradient de couleur du vert foncé vers le vert clair permet de suivre l'évolution temporelle — les premières années en bas à droite, le régime établi en haut à gauche.
 
 **Référence D–W** : même comportement pour les cerfs, mais la spirale est plus rapide et plus petite. Les cerfs sont moins sensibles : le coefficient de prédation c_WD = 2.0 est bien plus faible que c_WN = 7.5, et θ_D = 2 produit une régulation moins brutale. La convergence est atteinte plus tôt.
 
