@@ -184,13 +184,17 @@ Un point important : **le système ne revient pas à l'état initial**. Il garde
 
 *[SLIDE 11 — Portraits de phase]*
 
-Les portraits de phase permettent de visualiser non plus l'évolution temporelle mais la **trajectoire de l'écosystème dans l'espace des états** — ce que le graphe temporel ne montre pas.
+Les portraits de phase permettent de visualiser la **trajectoire de l'écosystème dans l'espace des états** — ce que le graphe temporel ne montre pas. La figure a quatre panneaux : deux pour la simulation de référence, deux pour le scénario Yellowstone.
 
-Pour la **simulation de référence**, le plan N-W montre une spirale amortie vers un attracteur — typique d'un système proie-prédateur à oscillations amorties. Le système n'oscille pas indéfiniment comme un Lotka-Volterra classique : il converge. Le gradient de couleur du vert foncé vers le vert clair permet de suivre l'évolution temporelle — les premières années en bas à droite, le régime établi en haut à gauche.
+**Référence N–W** : spirale amortie vers un attracteur. Oscillations loups-wapitis de type Lotka-Volterra, période ≈ 10 ans. Le système converge vers un point fixe stable vers t = 40 ans.
 
-Pour le **scénario Yellowstone**, le plan N-W montre quelque chose de très différent. Pendant les 20 premières années, la trajectoire est presque horizontale à W ≈ 0 — les wapitis évoluent sans loups. À t = 20 ans, le saut vertical correspond à la réintroduction. Puis la trajectoire remonte et converge vers la même région d'attraction que la référence — mais par un chemin beaucoup plus long, via un transient plus étendu.
+**Référence D–W** : même comportement pour les cerfs, mais la spirale est plus rapide et plus petite. Les cerfs sont moins sensibles : le coefficient de prédation c_WD = 2.0 est bien plus faible que c_WN = 7.5, et θ_D = 2 produit une régulation moins brutale. La convergence est atteinte plus tôt.
 
-Ce portrait de phase montre que les deux simulations convergent vers le même attracteur, mais depuis des états très différents.
+**Yellowstone N–W** : pendant les 20 premières années, la trajectoire est presque horizontale à W ≈ 0 — les wapitis évoluent librement. À t = 20 ans, le saut vertical correspond à la réintroduction. La trajectoire remonte ensuite vers le même attracteur que la référence, mais via un transient beaucoup plus long, car le système repart d'un état très éloigné.
+
+**Yellowstone D–W** : les cerfs croissent librement jusqu'à D ≈ 3.2, puis subissent une légère pression post-réintroduction. La convergence est rapide — les cerfs sont moins ciblés par les loups que les wapitis, et leur dynamique revient rapidement à l'attracteur.
+
+Les deux simulations convergent vers le même attracteur, mais depuis des états très différents.
 
 ---
 
