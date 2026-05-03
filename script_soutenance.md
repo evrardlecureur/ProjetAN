@@ -1,197 +1,276 @@
 # Script de Soutenance — Cascade Trophique
-## Projet Analyse Numérique 2025-2026 | 10 minutes | Evrard · Romain · Thibaud · Zhouair
+## Projet Analyse Numérique 2025-2026 | Evrard · Romain · Thibaud · Zouhair
+### Enseignants : C. Boulbe & V. Vadez — MAM, Polytech Nice Sophia
 
 ---
 
-> **Minutage indicatif** : 10 min = 600 sec  
-> Chaque section indique l'intervenant et le temps cible.  
-> Les **[crochets]** signalent les moments où changer de slide.
+> **Conventions de lecture**
+> - *[SLIDE N]* → changer de slide à ce moment
+> - **Gras** → insister à l'oral, ralentir
+> - *Italique* → commentaire de mise en scène, ne pas lire
+> - Les réponses aux questions fréquentes sont en fin de document
 
 ---
 
-## SLIDE 1 — Titre (30 sec) — *Evrard*
+## SLIDE 1 — Titre — *Evrard*
 
 *[SLIDE 1 — Titre]*
 
-Bonjour à tous. Nous présentons notre projet d'Analyse Numérique sur la modélisation d'une cascade trophique.
+Bonjour à tous.
 
-Notre équipe : Evrard, Romain, Thibaud et Zhouair.
+Nous présentons notre projet d'Analyse Numérique sur la modélisation d'une cascade trophique. Notre équipe : Evrard, Romain, Thibaud et Zouhair.
 
-L'objectif : résoudre numériquement un système de cinq équations différentielles ordinaires non linéaires représentant l'évolution de cinq populations en interaction — végétation, wapitis, cerfs, loups et ours — et étudier l'impact d'une réintroduction de loups dans cet écosystème.
+L'objectif central du projet est double. D'abord, résoudre numériquement un système de cinq équations différentielles ordinaires non linéaires représentant l'évolution de cinq populations en interaction — végétation, wapitis, cerfs, loups et ours. Ensuite, étudier l'impact d'une réintroduction de loups dans cet écosystème, en s'inspirant de ce qui s'est passé à Yellowstone en 1995.
+
+La structure de notre présentation suit le pipeline du projet : contexte biologique, modélisation mathématique, implémentation numérique, et résultats.
 
 ---
 
-## SLIDE 2 — Contexte & Motivation (60 sec) — *Evrard*
+## SLIDE 2 — Contexte & Motivation — *Evrard*
 
 *[SLIDE 2 — Contexte]*
 
 Une cascade trophique, c'est l'idée qu'un prédateur ne régule pas seulement ses proies directes — son effet se propage à travers tout le réseau trophique, jusqu'à la végétation.
 
-Des études de terrain de long terme — notamment à Isle Royale avec 41 ans de données loups-orignaux, et à Yellowstone depuis la réintroduction des loups en 1995 — ont révélé des dynamiques bien plus riches que les équations classiques de Lotka-Volterra.
+Des études de terrain de long terme — notamment à **Isle Royale avec 41 ans de données loups-orignaux continues**, et à Yellowstone depuis la réintroduction des loups en 1995 — ont révélé des dynamiques bien plus riches que les équations classiques de Lotka-Volterra.
 
-En particulier, la prédation des loups suit une réponse **dépendante du ratio** — le taux de mise à mort dépend du rapport prédateurs/proies, pas seulement de la densité des proies. La régulation des ongulés suit un modèle **thêta-logistique** avec θ ≈ 4, plus brutal que le modèle logistique standard. Et la réponse numérique des loups est logarithmique.
+Trois observations de terrain qui structurent directement notre modèle. Premièrement, la prédation des loups sur les grands ongulés suit une **réponse fonctionnelle dépendante du ratio** : le taux de mise à mort dépend du rapport prédateurs/proies et non de la densité des proies seule. C'est un résultat empirique, confirmé indépendamment sur Isle Royale et Yellowstone. Deuxièmement, la régulation des ongulés suit un modèle **thêta-logistique de Gilpin-Ayala** avec θ ≈ 4 — la régulation est bien plus abrupte qu'un modèle logistique standard à proximité de la capacité de charge. Troisièmement, la réponse numérique des loups — leur taux de croissance en fonction de leur taux de mise à mort — est **concave et logarithmique** : manger plus apporte de moins en moins de bénéfice reproductif.
 
-Enfin, ce système est **raide** : il couvre des échelles allant du sub-annuel — le forçage saisonnier de la chasse — au décennal pour les ours et les loups. C'est précisément cette raideur qui justifie de comparer nos méthodes numériques.
+Et ce système est **raide**. Il couvre des échelles de temps allant du sub-annuel — le forçage saisonnier de la chasse, période T = 1 an — au décennal pour les ours et les loups. C'est précisément cette raideur qui justifie de comparer nos méthodes numériques, et c'est le cœur mathématique du projet.
 
 ---
 
-## SLIDE 3 — Le Modèle Mathématique (90 sec) — *Romain*
+## SLIDE 3 — Le Modèle Mathématique — *Romain*
 
 *[SLIDE 3 — Modèle]*
 
-Le vecteur d'état est à cinq composantes. Je vais vous présenter rapidement la structure des équations.
+Le vecteur d'état est à cinq composantes : V pour la végétation, N pour les wapitis, D pour les cerfs, W pour les loups, B pour les ours.
 
-La **végétation V** suit une logistique standard, freinée par le pâturage des trois herbivores via des réponses de Holling type II — chaque terme a une demi-saturation différente, car les wapitis, cerfs et ours exploitent des strates de végétation différentes.
+Je vais vous présenter la logique biologique derrière chaque équation plutôt que de lire les formules — elles sont sur la slide.
 
-Les **ongulés** — wapitis N et cerfs D — suivent une croissance **thêta-logistique de Gilpin-Ayala**. La capacité de charge dépend de la végétation via une saturation de Monod : quand V tend vers zéro, κ tend vers zéro — c'est la famine. Les exposants θ_N = 4 et θ_D = 2 produisent une régulation bien plus abrupte qu'un modèle classique.
+**Végétation V.** Croissance logistique standard vers K_V = 500 kg·km⁻², freinée par le pâturage des trois herbivores. Chaque terme de pâturage est une réponse de Holling Type II — saturante — avec une demi-saturation différente pour chaque espèce, parce que wapitis, cerfs et ours exploitent des strates de végétation différentes.
 
-Les **loups W** ont un taux de croissance individuel logarithmique : r_W = ε₁·ln(Φ_W + η) − ε₂, directement tiré de Vucetich et al. 2011 calibré sur 41 ans de données. Le terme sin²(πt) crée le forçage saisonnier de la chasse, avec un pic tous les ans.
+**Wapitis N et cerfs D.** Croissance **thêta-logistique de Gilpin-Ayala**. Pourquoi θ = 4 pour les wapitis ? Parce qu'avec θ = 1 ou 2, la régulation à la capacité de charge est trop douce — les ongulés la dépassent facilement. Avec θ = 4, la régulation est très abrupte dès qu'on approche κ(V), ce qui correspond aux observations de terrain. La capacité de charge effective κ(V) dépend de la végétation via une saturation de Monod : quand V tend vers zéro, κ tend vers zéro. C'est le mécanisme de famine.
 
-Les **ours B** sont omnivores : leur gain énergétique combine la prédation sur les ongulés et la consommation directe de végétation. C'est ce qui explique leur croissance monotone dans nos simulations — ils n'ont pas de prédateur supérieur.
+Pour la prédation des loups sur les wapitis, on utilise la **réponse ratio-dépendante** : f_WN = c_WN · N / (W + β·N). Pourquoi pas une réponse proie-dépendante classique comme Holling Type II ? Parce que les données d'Isle Royale sur 41 ans montrent que le taux de mise à mort est mieux prédit par le ratio W/N que par N seul. Le comportement de chasse des loups change avec leur propre densité.
+
+**Loups W.** Le taux de croissance individuel est logarithmique : r_W = ε₁·ln(Φ_W + η) − ε₂, directement tiré de Vucetich et al. 2011, calibré sur ces 41 ans de données. Le terme η évite la divergence du logarithme quand Φ_W tend vers zéro — sans lui, le taux de croissance divergerait vers moins l'infini biologiquement. Le terme **sin²(πt) crée le forçage saisonnier** : nul en t = 0, 1, 2... et maximal en t = 0.5, 1.5... — la saison de chasse automnale. C'est ce qui rend le système non autonome et contribue à sa raideur.
+
+**Ours B.** Les ours sont omnivores : leur taux de croissance par individu combine la prédation sur les ongulés — réponses Type II sur N et D — et la consommation directe de végétation. Aucun terme de prélèvement humain ne pèse sur eux, contrairement aux loups. C'est pour ça qu'ils croissent de façon monotone dans nos simulations.
 
 ---
 
-## SLIDE 4 — Paramètres (30 sec) — *Romain*
+## SLIDE 4 — Paramètres & Conditions Initiales — *Romain*
 
 *[SLIDE 4 — Paramètres]*
 
-Tous les paramètres sont tirés directement du tableau page 7 du sujet — 23 constantes au total, regroupées par espèce dans `params.py`.
+Tous les paramètres sont tirés directement du tableau page 7 du sujet — 23 constantes au total, regroupées par espèce dans `params.py`. Pas d'estimation, pas d'ajustement : les valeurs sont données et biologiquement plausibles d'après la littérature.
 
-Les conditions initiales représentent l'état juste après une première réintroduction : végétation dense à 440, ongulés abondants, loups très peu nombreux à 0.04 animaux/km², ours modérés.
+Les conditions initiales représentent l'état écologique juste après une première réintroduction des loups : végétation dense à 440 kg·km⁻², ongulés abondants, loups très peu nombreux à 0.04 animaux/km², ours modérés à 0.25. C'est le point de départ de toutes nos simulations.
 
 ---
 
-## SLIDE 5 — Méthodes Numériques (90 sec) — *Thibaud*
+## SLIDE 5 — Méthodes Numériques — *Thibaud*
 
 *[SLIDE 5 — Méthodes]*
 
-Nous avons implémenté quatre méthodes numériques from scratch en Python pur.
+Nous avons implémenté quatre méthodes numériques **from scratch en Python pur** — sans scipy, sans odeint, sans boîte noire.
 
-**Euler explicite** : le schéma le plus simple, un pas vers l'avant. Conditionnellement stable. Sur ce système raide, un pas h = 0.5 an produit des erreurs de phase visibles sur les loups — environ 2.5% par oscillation saisonnière. Un pas h > 0.8 environ ferait diverger la solution.
+Avant de les présenter, un mot sur la raideur. Un système est raide quand son Jacobien a des valeurs propres de parties réelles de modules très différents. Ici, la végétation réagit en quelques mois, les loups en quelques années, les ours en une décennie — un rapport d'échelles d'environ 100. Euler explicite est contraint d'utiliser le pas le plus petit de toutes ces dynamiques pour rester stable — même quand on s'intéresse seulement aux ours. C'est le problème fondamental que les méthodes implicites résolvent.
 
-**Euler implicite** : le schéma backward. A-stable — inconditionnellement stable. À chaque pas, on résout un système non linéaire par Newton-Raphson. Même avec h = 0.5, la trajectoire reste stable bien que l'erreur de phase soit de signe opposé à Euler explicite.
+**Euler explicite** : schéma forward, u_{n+1} = u_n + h·F(t_n, u_n). Un seul appel à F par pas, mais conditionnellement stable. Sur ce système, un pas h = 0.5 an produit des erreurs de phase visibles sur les loups — environ ±2.5% par oscillation saisonnière. Au-delà de h ≈ 0.8 an, la solution diverge.
 
-**Crank-Nicolson** : la règle du trapèze implicite. Ordre 2, A-stable, symétrique en temps. Avec le même h = 0.5, la précision est environ dix fois meilleure qu'Euler implicite — on se superpose pratiquement à la référence RK4.
+**Euler implicite** : schéma backward, A-stable — inconditionnellement stable quelle que soit la valeur de h. À chaque pas, on résout le système non linéaire G(u_{n+1}) = 0 par Newton-Raphson. Même avec h = 0.5, la trajectoire reste stable, bien que l'erreur de phase soit de signe opposé à Euler explicite.
 
-**Runge-Kutta 4** : quatre évaluations de F par pas, ordre 4. Utilisé comme référence quasi-exacte à h = 0.005 an. L'erreur sur 10 ans est inférieure à 10⁻¹⁰.
+**Crank-Nicolson** : la règle du trapèze implicite, ordre 2, A-stable, symétrique en temps. Avec le même h = 0.5, la précision est environ dix fois meilleure qu'Euler implicite — la solution se superpose pratiquement à RK4. C'est la méthode la plus efficace sur ce système : même coût qu'Euler implicite, deux fois plus précise par ordre.
+
+**Runge-Kutta 4** : quatre évaluations de F par pas, ordre 4, mais explicite. Conditionnellement stable — il faut h ≤ 0.005 an sur ce système pour que l'erreur soit négligeable. Utilisé comme référence quasi-exacte.
 
 ---
 
-## SLIDE 6 — Architecture Python (30 sec) — *Romain*
+## SLIDE 6 — Architecture du Code Python — *Evrard*
 
 *[SLIDE 6 — Architecture]*
 
-Le code est organisé en quatre modules : `params.py` concentre tous les paramètres, `model.py` implémente la fonction F(t,u) avec ses cinq équations, `solvers.py` contient les quatre solveurs et le Newton-Raphson vectoriel, et `main.py` orchestre les simulations et génère les cinq figures.
+Le code est organisé en quatre modules avec une séparation claire des responsabilités.
+
+`params.py` concentre tous les paramètres et conditions initiales — une seule source de vérité, importée par les autres modules. `model.py` implémente la fonction F(t,u) avec les cinq équations. `solvers.py` contient les quatre solveurs et le Newton-Raphson vectoriel utilisé par les méthodes implicites. Et `main.py` orchestre les trois blocs de simulation : la simulation de base, le scénario Yellowstone, et l'analyse de convergence.
+
+La répartition du travail est dans le tableau — chaque membre avait un périmètre délimité pour éviter les conflits.
 
 ---
 
-## SLIDE 7 — Simulation de référence (60 sec) — *Zhouair*
+## SLIDE 7 — Simulation de Référence — *Zouhair*
 
 *[SLIDE 7 — Simulation de base]*
 
-Voici la simulation de référence sur 50 ans avec RK4 à h = 0.005 an, soit environ 1.8 jour.
+Cette simulation de référence sur 50 ans avec RK4 à h = 0.005 an — soit environ 1.8 jour par pas — **valide le modèle** : tous les comportements qualitatifs attendus de la littérature sont présents.
 
-On observe plusieurs comportements intéressants. La **végétation** décroît rapidement les premières années, sous l'effet du pâturage intense, puis se stabilise aux alentours de 434 kg/km² avant de remonter très lentement.
+La **végétation** décroît rapidement les premières années sous l'effet du pâturage intense, puis se stabilise aux alentours de 434 kg·km⁻² — soit 6 kg sous la capacité de charge maximale K_V = 500. Le pâturage permanent maintient un écart non nul avec K_V, ce qui est écologiquement cohérent.
 
-Les **wapitis** croissent jusqu'à un pic vers 4.71 animaux/km² aux alentours de t = 25 ans, puis décroissent sous la pression combinée des loups et des ours.
+Les **wapitis** croissent jusqu'à un pic de 4.72 animaux·km⁻² vers t ≈ 15-20 ans, puis déclinent sous la pression combinée des loups et des ours. La dynamique thêta-logistique produit un pic plus marqué et un déclin plus abrupt qu'un modèle logistique classique.
 
-Les **loups** montrent clairement les oscillations saisonnières annuelles du terme sin²(πt) — ces "dents de scie" correspondent aux saisons de chasse. Leur densité décline lentement car la ressource en proies diminue.
+Les **loups** montrent clairement les oscillations saisonnières annuelles du terme sin²(πt) — ces dents de scie correspondent exactement aux saisons de chasse. Leur densité décline lentement de 0.04 vers 0.028 sur 50 ans, car la ressource en proies diminue progressivement.
 
-Les **ours**, omnivores sans prédateur supérieur, croissent de façon monotone jusqu'à environ 1 animal/km² à t = 50 ans.
+Les **ours**, omnivores sans prédateur supérieur et sans prélèvement humain, croissent de façon monotone de 0.25 jusqu'à environ 1 animal·km⁻² à t = 50 ans — un facteur quatre. C'est la conséquence directe de leur omnivorie : ils bénéficient à la fois des ongulés et de la végétation.
 
 ---
 
-## SLIDE 8 — Comparaison des solveurs (60 sec) — *Thibaud*
+## SLIDE 8 — Comparaison des Solveurs — *Zouhair*
 
 *[SLIDE 8 — Comparaison]*
 
-Sur cette figure, on compare les quatre solveurs. RK4 à h = 0.005 est la référence. Les trois autres utilisent h = 0.5 an — seulement deux points par oscillation saisonnière d'un an.
+*[Zouhair présente : c'est lui qui a généré ces figures, il les commente de première main.]*
 
-Le résultat est frappant : pour la végétation, les wapitis, les cerfs et les ours, les quatre courbes sont pratiquement indiscernables à cette échelle. C'est là que les méthodes implicites montrent tout leur intérêt — à h égal à celui d'Euler explicite, elles donnent une précision bien supérieure.
+Sur cette figure, RK4 à h = 0.005 est la référence en noir. Les trois autres méthodes utilisent toutes h = 0.5 an — seulement deux points par oscillation saisonnière de période T = 1 an.
 
-La divergence est visible sur les **loups** : Euler explicite présente un léger décalage de phase positif, Euler implicite un décalage négatif. Crank-Nicolson reste collé à RK4. C'est une validation directe des ordres de convergence.
+Commençons par ce qui ne diverge pas. Pour la végétation, les wapitis, les cerfs et les ours — les quatre courbes sont pratiquement indiscernables. C'est là que les méthodes implicites montrent tout leur intérêt : avec un pas 100 fois plus grand que RK4, elles restent parfaitement stables et précises sur les dynamiques lentes.
+
+La divergence est concentrée sur les **loups**, et c'est une validation directe des ordres de convergence. Euler explicite présente un décalage de phase positif d'environ +2.5% aux pics saisonniers — il anticipe le pic. Euler implicite présente un décalage de signe opposé, −2.4% — il retarde le pic. Ces erreurs de phase de sens contraire s'expliquent par la nature des schémas : l'un évalue F au début du pas, l'autre à la fin. **Crank-Nicolson fait la moyenne des deux — l'erreur se compense, et la courbe reste collée à RK4.**
+
+Le zoom en bas de slide le montre très clairement : à h = 0.5 an, Euler explicite **divergerait** si on augmentait encore le pas. Euler implicite et Crank-Nicolson restent stables.
 
 ---
 
-## SLIDE 9 — Convergence (60 sec) — *Thibaud*
+## SLIDE 9 — Analyse de Convergence — *Thibaud*
 
 *[SLIDE 9 — Convergence]*
 
-Pour quantifier précisément les ordres de convergence, nous avons mesuré l'erreur relative en norme L² au temps final T = 10 ans, en faisant varier le pas de discrétisation entre h = 0.002 et h = 0.064.
+Pour quantifier les ordres de convergence, nous avons mesuré l'erreur relative en norme L² au temps final T = 10 ans en faisant varier le pas entre h = 0.002 et h = 0.064. La solution de référence est RK4 à h = 0.0005 an.
 
-Sur ce graphe log-log, la pente des droites donne l'ordre empirique. On retrouve bien les ordres théoriques : Euler explicite et implicite convergent en O(h) avec une pente ≈ 1. Crank-Nicolson converge en O(h²) — pente ≈ 3.6 légèrement supérieure au théorique car le système est lisse et les constantes d'erreur très favorables.
+Sur ce graphe log-log, la pente des droites donne l'ordre empirique.
 
-RK4 présente une pente apparente de 7.4 — supérieure au théorique de 4 — parce qu'aux petits pas, l'erreur atteint la **précision machine** (≈ 10⁻¹⁵). L'erreur d'arrondi domine alors, et la pente mesurée ne correspond plus à l'ordre de la méthode.
+**Euler explicite et implicite** convergent en O(h) — pente ≈ 1, conforme au théorique.
+
+**Crank-Nicolson** : pente mesurée ≈ 3.6, supérieure au théorique de 2. Pourquoi ? On est dans un régime pré-asymptotique : les dérivées d'ordre 3 de la solution sont petites dans cette plage de h, ce qui favorise Crank-Nicolson. Si on testait des h encore plus petits, on convergerait asymptotiquement vers la pente 2. La figure le montre d'ailleurs : sur les grands h, la pente effective approche 2.
+
+**RK4** : pente apparente ≈ 7.4, bien supérieure au théorique de 4. C'est un artefact numérique. Pour les petits pas, l'erreur de troncature descend en dessous de la **précision machine** — environ 10⁻¹⁵. On mesure alors l'erreur d'arrondi, qui se comporte différemment. La pente ne correspond plus à l'ordre de la méthode, mais au plancher numérique. C'est une bonne chose : ça signifie que RK4 à h = 0.005 est essentiellement exact pour nos simulations.
 
 ---
 
-## SLIDE 10 — Scénario Yellowstone (60 sec) — *Zhouair*
+## SLIDE 10 — Scénario Yellowstone — *Zouhair*
 
 *[SLIDE 10 — Yellowstone]*
 
 Nous avons modélisé un scénario inspiré de la réintroduction historique des loups à Yellowstone en 1995.
 
-Le protocole : pendant les 20 premières années, W = 0 exactement. Le terme dW/dt est proportionnel à W, donc zéro loups reste un équilibre stable. À t = 20 ans, on introduit W = 0.04 animaux/km² — les mêmes conditions initiales que la simulation de référence.
+Le **protocole de simulation** repose sur une observation mathématique : dW/dt est proportionnel à W dans l'équation des loups. Donc si W(0) = 0, les loups restent absents — c'est un équilibre trivial stable. On peut donc simuler rigoureusement un écosystème sans loups simplement en posant W = 0 comme condition initiale. À t = 20 ans, on réintroduit W = 0.04 animaux·km⁻² et on reprend l'intégration à partir du dernier état de la phase sans loups.
 
-Pendant la **phase sans loups**, les wapitis prolifèrent jusqu'à 5.5 animaux/km² — soit 22% de plus que dans la référence. La végétation se dégrade, tombant à environ 424 kg/km². Les ours croissent librement.
+**Phase sans loups, t = 0 à 20 ans.** Sans régulation par prédation, les wapitis prolifèrent librement jusqu'à **5.63 animaux·km⁻²**, soit **25% de plus** que dans la simulation de référence. Ce surnombre intensifie le pâturage : la végétation tombe à **422 kg·km⁻²**, son minimum sur toute la simulation. Les ours, eux, bénéficient de l'abondance d'ongulés et croissent plus vite qu'en référence.
 
-À la **réintroduction**, on observe immédiatement la cascade trophique se mettre en place : la prédation augmente, les ongulés diminuent, le pâturage diminue, et la végétation commence à se régénérer — elle regagne environ 10 kg/km² par rapport à son creux.
+**Réintroduction à t = 20 ans.** On observe immédiatement la cascade trophique se mettre en place. La prédation augmente, les ongulés diminuent, le pâturage diminue, la végétation commence à se régénérer.
+
+**Phase post-réintroduction, t = 20 à 50 ans.** En régime quasi-permanent, comparé à la simulation de référence : la végétation est **+3 kg·km⁻²** plus dense, les wapitis sont **−0.28 animaux·km⁻²** moins nombreux, et les loups s'établissent légèrement plus haut à 0.035 — parce qu'ils ont trouvé un écosystème plus riche en proies.
+
+Un point important : **le système ne revient pas à l'état initial**. Il garde la mémoire des 20 ans sans loups. Les wapitis restent en moyenne moins nombreux que dans la référence, la végétation reste légèrement plus dense — la cascade a eu lieu, mais à partir d'un état différent.
+
+*[Point de comparaison qualitative à mentionner si on a le temps]* : À Yellowstone, entre 1995 et 2010, les biologistes ont observé une réduction significative des wapitis et un début de recolonisation végétale — notamment dans les zones riveraines. Notre modèle capture qualitativement ces tendances, même si les ordres de grandeur diffèrent d'un modèle simplifié à la réalité de terrain.
 
 ---
 
-## SLIDE 11 — Portraits de phase (30 sec) — *Zhouair*
+## SLIDE 11 — Portraits de Phase — *Zouhair*
 
 *[SLIDE 11 — Portraits de phase]*
 
-Les portraits de phase permettent de visualiser la trajectoire de l'écosystème dans l'espace des états.
+Les portraits de phase permettent de visualiser non plus l'évolution temporelle mais la **trajectoire de l'écosystème dans l'espace des états** — ce que le graphe temporel ne montre pas.
 
-Pour la simulation de référence, on voit une **spirale amortie** vers un attracteur dans le plan N-W — typique d'un système proie-prédateur à oscillations amorties.
+Pour la **simulation de référence**, le plan N-W montre une spirale amortie vers un attracteur — typique d'un système proie-prédateur à oscillations amorties. Le système n'oscille pas indéfiniment comme un Lotka-Volterra classique : il converge. Le gradient de couleur du vert foncé vers le vert clair permet de suivre l'évolution temporelle — les premières années en bas à droite, le régime établi en haut à gauche.
 
-Pour le scénario Yellowstone, le plan N-W montre clairement les 20 ans sans loups comme un point quasi-fixe à W = 0, puis la trajectoire qui remonte brutalement à la réintroduction.
+Pour le **scénario Yellowstone**, le plan N-W montre quelque chose de très différent. Pendant les 20 premières années, la trajectoire est presque horizontale à W ≈ 0 — les wapitis évoluent sans loups. À t = 20 ans, le saut vertical correspond à la réintroduction. Puis la trajectoire remonte et converge vers la même région d'attraction que la référence — mais par un chemin beaucoup plus long, via un transient plus étendu.
+
+Ce portrait de phase montre que les deux simulations convergent vers le même attracteur, mais depuis des états très différents.
 
 ---
 
-## SLIDE 12 — Newton-Raphson (30 sec) — *Thibaud*
+## SLIDE 12 — Newton-Raphson Vectoriel — *Thibaud*
 
 *[SLIDE 12 — Newton-Raphson]*
 
-Le cœur des méthodes implicites est la résolution du système non linéaire G(u) = 0 à chaque pas. Nous avons implémenté un Newton-Raphson vectoriel avec un Jacobien approché par différences finies centrées, colonne par colonne. L'incrément ε est la racine carrée de l'epsilon machine, soit environ 1.49·10⁻⁸.
+Le cœur des méthodes implicites est la résolution à chaque pas du système non linéaire G(u_{n+1}) = 0.
 
-À chaque itération, on résout le système linéaire J·δ = −G(u) par élimination gaussienne via `np.linalg.solve`. La convergence est atteinte en 3 à 6 itérations en pratique, pour un coût d'environ 30 à 60 évaluations de F par pas — contre 4 pour RK4. C'est le prix de la stabilité inconditionnelle.
+L'algorithme comporte trois étapes. D'abord, un **prédicteur par Euler explicite** : u⁰ = u_n + h·F(t_n, u_n). C'est une approximation grossière de u_{n+1}, mais suffisante pour initialiser Newton. Ensuite, le **Jacobien par différences finies centrées**, colonne par colonne : J[:,j] ≈ [G(u+ε·e_j) − G(u−ε·e_j)] / (2ε), avec ε = √ε_machine ≈ 1.49·10⁻⁸. Enfin, l'**itération de Newton** : on résout J·δ = −G(u) par élimination gaussienne via `numpy.linalg.solve`, puis u ← u + δ, jusqu'à ce que ‖G(u)‖ < 10⁻¹⁰.
+
+Pourquoi le Jacobien est-il numérique et non analytique ? On aurait pu le calculer analytiquement — les équations sont connues, les dérivées partielles existent. Mais les différences finies nous donnent la **généricité** : ce Newton-Raphson fonctionne pour n'importe quelle fonction F, sans réécrire le Jacobien si le modèle change. C'est un choix de conception, pas un raccourci.
+
+La convergence est atteinte en **3 à 6 itérations** en pratique — ce qui peut sembler surprenant avec un prédicteur aussi grossier. C'est parce que le système est suffisamment régulier : le bassin d'attraction de la solution est large, et le prédicteur tombe toujours dedans.
+
+Le coût par pas : environ 30 à 60 évaluations de F, contre 4 pour RK4. C'est le prix de la stabilité inconditionnelle. Mais ce prix est amorti sur le nombre de pas : Euler implicite à h = 0.5 avec 60 évaluations de F par pas sur 100 pas au total, contre RK4 à h = 0.005 avec 4 évaluations par pas sur 10 000 pas — le coût total est comparable, avec une stabilité garantie.
 
 ---
 
-## SLIDE 13 — Conclusion (30 sec) — *Evrard*
+## SLIDE 13 — Conclusion — *Evrard*
 
 *[SLIDE 13 — Conclusion]*
 
-Pour conclure, ce projet nous a permis de mettre en œuvre un modèle biologique réaliste à cinq espèces, d'implémenter et de valider quatre solveurs numériques — dont deux méthodes implicites avec Newton-Raphson from scratch — de vérifier numériquement les ordres de convergence théoriques, et de simuler et interpréter un scénario de réintroduction de prédateur dans un écosystème.
+Ce projet partait d'une question biologique : que se passe-t-il quand on réintroduit un prédateur apical dans un écosystème qui en est privé depuis 20 ans ? Pour y répondre, il fallait un modèle mathématique réaliste, des solveurs capables de gérer la raideur, et une validation rigoureuse des méthodes. Les trois sont là.
 
-Le résultat le plus marquant : sur ce système raide, Euler implicite et Crank-Nicolson permettent d'utiliser un pas 100 fois plus grand que RK4, tout en restant stables. La raideur justifie pleinement l'usage de schémas implicites.
+Le résultat numérique qu'on retient : sur un système raide, la stabilité inconditionnelle d'Euler implicite et de Crank-Nicolson n'est pas un détail technique — c'est ce qui permet d'observer la dynamique décennale des ours sans être contraint par le pas de temps sub-annuel de la saison de chasse. Le rapport d'échelles est de 100. Sans méthodes A-stables, on ne peut pas explorer ce système efficacement.
+
+Et écologiquement : réintroduire les loups après 20 ans d'absence ne remet pas le système à l'état initial. L'écosystème **garde la mémoire de ces 20 ans** — les wapitis sont encore plus nombreux, la végétation plus dégradée, et la cascade trophique qui s'enclenche est plus abrupte que dans la simulation de référence. C'est ce que le modèle prédit, et c'est qualitativement cohérent avec les observations de Yellowstone.
 
 Merci pour votre attention. Nous sommes prêts pour vos questions.
 
 ---
 
-## Questions fréquentes — Réponses préparées
+---
 
-**Q : Pourquoi ne pas utiliser scipy.solve_ivp ?**
-> Le sujet exige des implémentations from scratch. C'est l'objet même du cours d'analyse numérique — comprendre les mécanismes internes des solveurs, pas les utiliser comme boîte noire.
+## Réponses aux questions fréquentes
 
-**Q : Pourquoi le pas de référence est-il h = 0.005 et non h = 0.001 ?**
-> À h = 0.005, l'erreur de RK4 est déjà inférieure à 10⁻¹⁰ en norme relative sur 10 ans. Descendre à h = 0.001 multiplie le temps de calcul par 5 sans gain pratique. La vérification par la courbe de convergence fig5 confirme qu'à ce pas, l'erreur est dans le plancher numérique.
+---
+
+**Q : Pourquoi ne pas utiliser `scipy.solve_ivp` ?**
+
+Le sujet exige des implémentations from scratch. C'est l'objet même du cours d'analyse numérique — comprendre les mécanismes internes des solveurs, pas les utiliser comme boîte noire. Utiliser `scipy.solve_ivp` reviendrait à résoudre un problème de cryptographie en important une bibliothèque RSA.
+
+---
+
+**Q : Pourquoi le Jacobien est-il approché par différences finies et non calculé analytiquement ?**
+
+On aurait pu le calculer analytiquement — les dérivées partielles de F existent et sont finies. Mais les différences finies centrées nous donnent la généricité : le même Newton-Raphson fonctionne pour n'importe quelle F, sans réécrire le Jacobien si le modèle change. Sur un système à 5 espèces, le Jacobien analytique ferait 25 termes — certains assez longs. L'erreur de différences finies centrées est en O(ε²) avec ε = √ε_machine ≈ 10⁻⁸, ce qui donne une précision de l'ordre de 10⁻¹⁶ — largement suffisante pour la convergence Newton.
+
+---
+
+**Q : Pourquoi le pas de référence est h = 0.005 an et non h = 0.001 ?**
+
+À h = 0.005, l'erreur relative de RK4 est déjà inférieure à 10⁻¹⁰ sur 10 ans — on est dans le plancher numérique. La courbe de convergence (fig5) le confirme : à ce pas, l'erreur d'arrondi domine la troncature. Descendre à h = 0.001 multiplierait le temps de calcul par 5 sans aucun gain pratique. C'est une décision guidée par l'analyse de convergence elle-même.
+
+---
 
 **Q : Le scénario Yellowstone est-il réaliste écologiquement ?**
-> Les paramètres sont biologiquement plausibles (tirés de la littérature), mais le modèle est simplifié. En particulier, on néglige la structure d'âge, la dispersion spatiale, et les phénomènes comportementaux (ecology of fear). Néanmoins, les tendances qualitatives — augmentation de la végétation, diminution des wapitis après réintroduction — correspondent aux observations de terrain à Yellowstone.
+
+Les paramètres sont biologiquement plausibles — tirés de la littérature sur Isle Royale et Yellowstone. Mais le modèle est simplifié par construction. On néglige la structure d'âge des populations, la dispersion spatiale, les phénomènes comportementaux comme l'ecologie de la peur — fear ecology — où les proies modifient leur comportement spatial même en présence de peu de prédateurs. On néglige aussi la saisonnalité de la reproduction. Néanmoins, les tendances qualitatives correspondent aux observations : réduction des ongulés, régénération végétale, augmentation des ours grizzlis après la réintroduction des loups à Yellowstone entre 1995 et 2010.
+
+---
 
 **Q : Pourquoi l'ordre empirique de RK4 est-il 7.4 au lieu de 4 ?**
-> Pour les petits pas h ≤ 0.002, l'erreur de troncature descend en dessous de la précision machine (≈ 10⁻¹⁵). On mesure alors l'erreur d'arrondi, qui se comporte différemment selon h. La pente mesurée en log-log ne correspond plus à l'ordre de la méthode mais au comportement de l'erreur numérique. C'est pour ça qu'on dit que RK4 a "atteint le plancher".
+
+Pour les petits pas h ≤ 0.002, l'erreur de troncature descend en dessous de la précision machine, environ 10⁻¹⁵. On mesure alors l'erreur d'arrondi flottant, qui dépend de h différemment selon les opérations. La pente log-log ne correspond plus à l'ordre de la méthode mais au comportement de l'erreur numérique dans ce régime. C'est ce qu'on appelle le plancher numérique. C'est en réalité une bonne nouvelle : ça confirme que RK4 à h = 0.005 est aussi précis que possible sur cette machine.
+
+---
 
 **Q : Pourquoi Crank-Nicolson donne p ≈ 3.6 au lieu de 2 ?**
-> Les constantes d'erreur de Crank-Nicolson sont très favorables sur ce système (les dérivées d'ordre 3 sont petites dans la plage de h testée). En pratique, on est dans un régime pré-asymptotique où l'ordre apparent est supérieur à l'ordre asymptotique. Si on testait des h beaucoup plus petits, on convergerait vers 2.
+
+L'ordre 2 est l'ordre asymptotique — celui qu'on observe quand h → 0. Sur notre plage de h, on est dans un régime pré-asymptotique où les termes d'ordre supérieur de l'erreur de troncature ne sont pas encore négligeables. Les dérivées d'ordre 3 et 4 de la solution sont petites sur ce système dans cette plage de h, ce qui fait que les termes suivants dans le développement de Taylor contribuent favorablement. Si on testait des h beaucoup plus petits — avant le plancher numérique — on convergerait asymptotiquement vers la pente 2.
+
+---
 
 **Q : Comment fonctionne exactement le forçage saisonnier ?**
-> Le terme μ_W · sin²(πt) · W a une période T = 1 an. Il est nul en t = 0, 1, 2... (printemps-été) et maximal en t = 0.5, 1.5... (automne-hiver — la saison de chasse). Il représente la mortalité additionnelle due à la chasse humaine saisonnière. Les "dents de scie" visibles sur la courbe des loups dans fig1 correspondent exactement à ces pics annuels.
+
+Le terme μ_W · sin²(πt) · W a une période T = 1 an. Il est nul en t = 0, 1, 2... représentant le printemps-été, et maximal en t = 0.5, 1.5... représentant l'automne-hiver — la saison de chasse. Il représente la mortalité additionnelle due à la chasse humaine. Les dents de scie visibles sur la courbe des loups dans fig1 correspondent exactement à ces pics annuels. C'est ce terme qui rend le système non autonome et contribue à la raideur.
+
+---
+
+**Q : Qu'est-ce que ce projet vous a appris ?**
+
+*[Chaque membre répond pour lui-même — réponses préparées ci-dessous.]*
+
+**Evrard** : *"J'ai compris que la modélisation n'est pas neutre. Le choix de la réponse ratio-dépendante pour les loups versus une réponse proie-dépendante classique change qualitativement la dynamique, pas seulement quantitativement. Deux modèles d'apparence proche peuvent produire des comportements écologiquement très différents."*
+
+**Romain** : *"Implémenter F(t,u) m'a forcé à lire les équations ligne par ligne. J'ai réalisé que le terme η dans le logarithme des loups n'est pas anodin — sans lui, quand Φ_W tend vers zéro, le taux de croissance des loups diverge vers moins l'infini, ce qui est biologiquement absurde. Chaque paramètre a une justification, même les plus petits."*
+
+**Thibaud** : *"Ce qui m'a surpris c'est que Newton-Raphson converge en 3 à 6 itérations même avec un prédicteur aussi grossier qu'Euler explicite. Le système est suffisamment régulier pour que le bassin d'attraction de la solution soit très large. J'aurais pensé qu'il fallait un meilleur prédicteur."*
+
+**Zouhair** : *"Le scénario Yellowstone m'a montré que la dynamique post-réintroduction dépend fortement de l'état du système au moment de la réintroduction. Si on introduit les loups quand les wapitis sont à leur maximum après 20 ans de prolifération, la cascade est plus violente que si on les introduit en régime stable. Le système a une mémoire, et cette mémoire compte."*
 
 ---
 
