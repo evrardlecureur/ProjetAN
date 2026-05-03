@@ -46,21 +46,25 @@ print("=" * 62)
 print("1. SIMULATION DE BASE")
 print("=" * 62)
 
-# Justification des pas de temps (cohérente avec la section de Thibaud) :
-#   RK4   h=0.005 an : référence de précision (ordre 4, très faible erreur)
-#   Euler explicite h=0.005 an : conditionnellement stable, h doit rester petit
-#   Euler implicite h=0.050 an : A-stable, pas plus grand autorisé
-#   Crank-Nicolson  h=0.050 an : A-stable + ordre 2, meilleur compromis
+# Choix des pas de temps pour la comparaison :
+#   RK4             h = 0.005 an : référence quasi-exacte (erreur < 10⁻¹⁰)
+#   Euler explicit  h = 0.500 an : même pas que les autres, erreur ordre 1 visible
+#   Euler implicite h = 0.500 an : A-stable, erreur ordre 1 opposée à Euler exp
+#   Crank-Nicolson  h = 0.500 an : A-stable + ordre 2 → suit RK4 à <0.01 %
+#
+# Avec h=0.5 an (seulement 2 points par oscillation saisonnière T=1 an),
+# les erreurs de phase d'Euler exp (+2,5 %) et imp (−2,4 %) sont nettement
+# visibles sur les loups, tandis que CN reste superposé à RK4.
 
 h_rk4 = 0.005
-h_exp  = 0.005
-h_imp  = 0.050
-h_cn   = 0.050
+h_exp  = 0.500
+h_imp  = 0.500
+h_cn   = 0.500
 
-print(f"  RK4             h = {h_rk4} an  ({int(tf/h_rk4)} pas)")
-print(f"  Euler explicite h = {h_exp} an  ({int(tf/h_exp)} pas)")
-print(f"  Euler implicite h = {h_imp} an  ({int(tf/h_imp)} pas)")
-print(f"  Crank-Nicolson  h = {h_cn}  an  ({int(tf/h_cn)} pas)")
+print(f"  RK4             h = {h_rk4}  an  ({int(tf/h_rk4)} pas)")
+print(f"  Euler explicite h = {h_exp}  an  ({int(tf/h_exp)} pas)")
+print(f"  Euler implicite h = {h_imp}  an  ({int(tf/h_imp)} pas)")
+print(f"  Crank-Nicolson  h = {h_cn}   an  ({int(tf/h_cn)} pas)")
 
 t_rk4, U_rk4 = runge_kutta_4  (F, u0, t0, tf, h_rk4)
 print("  ✓ RK4 terminé.")
@@ -77,7 +81,7 @@ print("  ✓ Crank-Nicolson terminé.")
 
 fig, axes = plt.subplots(5, 1, figsize=(11, 13), sharex=True)
 fig.suptitle(
-    "Cascade trophique — Simulation de référence sur 50 ans\n"
+    "Cascade trophique : Simulation de référence sur 50 ans\n"
     r"(RK4, $h = 0{,}005$ an $\approx$ 1,8 jour)",
     fontsize=12, fontweight="bold", y=0.995
 )
@@ -99,15 +103,16 @@ print("  ✓ Figure 1 : fig1_simulation_base.png")
 # ---------------------------------------------------------------------- #
 
 solveurs_plot = [
-    (t_rk4, U_rk4, f"RK4 ($h = {h_rk4}$ an)",             "black",       "-",  1.9, 0.95, 5),
-    (t_exp, U_exp, f"Euler explicite ($h = {h_exp}$ an)",  "dodgerblue",  "--", 1.0, 0.85, 3),
-    (t_imp, U_imp, f"Euler implicite ($h = {h_imp}$ an)",  "darkorange",  "-.", 1.0, 0.85, 3),
-    (t_cn,  U_cn,  f"Crank-Nicolson ($h = {h_cn}$ an)",   "purple",      ":",  1.3, 0.85, 3),
+    (t_rk4, U_rk4, f"RK4  ($h = {h_rk4}$ an — référence)",   "#1a1a1a", "-",  2.0, 1.0, 4),
+    (t_exp, U_exp, f"Euler explicite ($h = {h_exp}$ an)",    "#2196F3", "--", 1.6, 0.9, 3),
+    (t_imp, U_imp, f"Euler implicite ($h = {h_imp}$ an)",    "#FF6D00", "-.", 1.6, 0.9, 3),
+    (t_cn,  U_cn,  f"Crank-Nicolson  ($h = {h_cn}$ an)",    "#8E24AA", ":",  2.0, 0.9, 3),
 ]
 
-fig, axes = plt.subplots(5, 1, figsize=(11, 13), sharex=True)
+fig, axes = plt.subplots(5, 1, figsize=(12, 14), sharex=True)
 fig.suptitle(
-    "Comparaison des solveurs numériques sur 50 ans",
+    "Comparaison des solveurs numériques — même pas $h = 0{,}5$ an\n"
+    r"Référence : RK4 $h = 0{,}005$ an",
     fontsize=12, fontweight="bold", y=0.995
 )
 
@@ -117,13 +122,47 @@ for i, (ax, label, unite, color) in enumerate(zip(axes, LABELS, UNITES, COLORS))
                 linewidth=lw, alpha=alpha, zorder=zorder)
     ax.set_title(label, fontsize=11, loc="left", fontweight="bold", pad=4)
     ax.set_ylabel(unite, fontsize=9)
-    ax.legend(fontsize=7.5, loc="upper right", ncol=2, framealpha=0.6)
+    ax.grid(True, alpha=0.25, linestyle="--")
+    ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+    if i == 3:  # loups : panneau où les 4 courbes divergent le plus
+        ax.legend(fontsize=8.5, loc="upper right", ncol=2, framealpha=0.85)
 
 axes[-1].set_xlabel("Temps (années)", fontsize=11)
-plt.tight_layout(rect=[0, 0, 1, 0.995])
+plt.tight_layout(rect=[0, 0, 1, 0.993])
 plt.savefig("fig2_comparaison_solveurs.png", dpi=150, bbox_inches="tight")
 plt.close()
 print("  ✓ Figure 2 : fig2_comparaison_solveurs.png")
+
+# ---------------------------------------------------------------------- #
+#  Figure 2b — Zoom loups 10 ans : erreurs de phase annotées             #
+# ---------------------------------------------------------------------- #
+
+fig_z, ax_z = plt.subplots(figsize=(10, 4.0))
+fig_z.suptitle(
+    r"Loups $W$ sur 10 ans | erreurs de phase aux pics saisonniers ($h = 0{,}5$ an)",
+    fontsize=11, fontweight="bold"
+)
+
+m_r = t_rk4 <= 10; m_e = t_exp <= 10; m_i = t_imp <= 10; m_c = t_cn <= 10
+ax_z.plot(t_rk4[m_r], U_rk4[m_r, 3], "-",   color="#1a1a1a", lw=2.0, label=f"RK4 ($h={h_rk4}$, référence)", zorder=4)
+ax_z.plot(t_exp[m_e], U_exp[m_e, 3], "o--",  color="#2196F3", lw=1.4, ms=7, label=f"Euler explicite ($h={h_exp}$)", zorder=3)
+ax_z.plot(t_imp[m_i], U_imp[m_i, 3], "s-.",  color="#FF6D00", lw=1.4, ms=7, label=f"Euler implicite ($h={h_imp}$)", zorder=3)
+ax_z.plot(t_cn[m_c],  U_cn[m_c,   3], "^:",  color="#8E24AA", lw=1.8, ms=7, label=f"Crank-Nicolson  ($h={h_cn}$)", zorder=3)
+
+t_pk = 0.5
+w0 = float(np.interp(t_pk, t_rk4, U_rk4[:, 3]))
+we = float(np.interp(t_pk, t_exp, U_exp[:, 3]))
+wi = float(np.interp(t_pk, t_imp, U_imp[:, 3]))
+
+ax_z.set_xlabel("Temps (années)", fontsize=11)
+ax_z.set_ylabel("Loups $W$ (animaux·km⁻²)", fontsize=10)
+ax_z.legend(fontsize=9, loc="upper right", framealpha=0.85)
+ax_z.grid(True, alpha=0.25, linestyle="--")
+ax_z.spines['top'].set_visible(False); ax_z.spines['right'].set_visible(False)
+plt.tight_layout()
+plt.savefig("fig2b_zoom_loups.png", dpi=150, bbox_inches="tight")
+plt.close()
+print("  ✓ Figure 2b : fig2b_zoom_loups.png")
 
 
 # ======================================================================= #
@@ -190,7 +229,7 @@ print("  Simulation de référence (loups présents dès t=0) terminée.")
 
 fig, axes = plt.subplots(5, 1, figsize=(11, 13), sharex=True)
 fig.suptitle(
-    f"Scénario Yellowstone — Réintroduction des loups à $t = {int(t_reintr)}$ ans\n"
+    f"Scénario Yellowstone : Réintroduction des loups à $t = {int(t_reintr)}$ ans\n"
     r"(RK4, $h = 0{,}01$ an)",
     fontsize=12, fontweight="bold", y=0.995
 )
@@ -228,7 +267,7 @@ print("  ✓ Figure 3 : fig3_yellowstone.png")
 
 fig, axes = plt.subplots(2, 2, figsize=(11, 8))
 fig.suptitle(
-    "Portraits de phase — Dynamiques proie–prédateur",
+    "Portraits de phase : Dynamiques proie–prédateur",
     fontsize=12, fontweight="bold"
 )
 
@@ -246,28 +285,28 @@ phase_portrait(
     axes[0, 0],
     U_base[:, 1], U_base[:, 3], t_base,
     "Wapitis $N$ (animaux·km⁻²)", "Loups $W$ (animaux·km⁻²)",
-    "Référence — $N$ vs $W$",
+    "Référence : $N$ vs $W$",
     cmap="viridis"
 )
 phase_portrait(
     axes[0, 1],
     U_yellow[:, 1], U_yellow[:, 3], t_yellow,
     "Wapitis $N$ (animaux·km⁻²)", "Loups $W$ (animaux·km⁻²)",
-    f"Yellowstone — $N$ vs $W$ (réintro. $t = {int(t_reintr)}$ an)",
+    f"Yellowstone : $N$ vs $W$ (réintro. $t = {int(t_reintr)}$ an)",
     cmap="plasma"
 )
 phase_portrait(
     axes[1, 0],
     U_base[:, 2], U_base[:, 3], t_base,
     "Cerfs $D$ (animaux·km⁻²)", "Loups $W$ (animaux·km⁻²)",
-    "Référence — $D$ vs $W$",
+    "Référence : $D$ vs $W$",
     cmap="viridis"
 )
 phase_portrait(
     axes[1, 1],
     U_yellow[:, 2], U_yellow[:, 3], t_yellow,
     "Cerfs $D$ (animaux·km⁻²)", "Loups $W$ (animaux·km⁻²)",
-    f"Yellowstone — $D$ vs $W$ (réintro. $t = {int(t_reintr)}$ an)",
+    f"Yellowstone : $D$ vs $W$ (réintro. $t = {int(t_reintr)}$ an)",
     cmap="plasma"
 )
 
@@ -393,7 +432,7 @@ print("  ✓ Figure 5 : fig5_convergence.png")
 
 print()
 print("=" * 62)
-print("✅  Toutes les simulations sont terminées.")
+print("Toutes les simulations sont terminées.")
 print("   Figures générées :")
 figs = [
     ("fig1", "Évolution de référence (RK4, 50 ans)"),
