@@ -52,7 +52,7 @@ C'est exactement cette différence d'échelles qui a rendu la résolution numér
 
 *[SLIDE 3 — Modèle]*
 
-Le vecteur d'état de notre système contient cinq composantes : V pour la végétation, N pour les wapitis, D pour les cerfs, W pour les loups, et B pour les ours. Je vais vous présenter la logique biologique derrière chaque équation plutôt que de lire les formules — elles sont sur la slide.
+Le vecteur d'état de notre système contient cinq composantes : V pour la végétation, N pour les wapitis, D pour les cerfs, W pour les loups, et B pour les ours. On va voir la logique biologique derrière chaque équation.
 
 **Végétation.** La végétation suit une croissance logistique standard vers une capacité de charge maximale de 500 kg par km². Elle est freinée par le pâturage des trois herbivores. Chaque terme de pâturage est une réponse de Holling Type II — c'est-à-dire saturante — avec une demi-saturation différente pour chaque espèce, parce que wapitis, cerfs et ours n'exploitent pas les mêmes strates de végétation.
 
