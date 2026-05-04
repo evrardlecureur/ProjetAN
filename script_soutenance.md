@@ -122,6 +122,8 @@ La **végétation** décroît rapidement les premières années sous l'effet du 
 
 Les **wapitis** croissent jusqu'à un pic de 4.72 animaux·km⁻² vers t ≈ 15-20 ans, puis déclinent sous la pression combinée des loups et des ours. La dynamique thêta-logistique produit un pic plus marqué et un déclin plus abrupt qu'un modèle logistique classique.
 
+Les **cerfs**  croissent rapidement sur les premières années jusqu'à un pic de 3.15 animaux·km⁻² vers t ≈ 8 ans, puis se stabilisent autour de 3.04 en régime permanent. Leur dynamique est moins spectaculaire que celle des wapitis parce que la prédation des loups sur les cerfs est proportionnellement moins intense que sur les wapitis. Les loups concentrent l'essentiel de leur effort sur les wapitis 
+
 Les **loups** montrent clairement les oscillations saisonnières annuelles du terme sin²(πt) — ces dents de scie correspondent exactement aux saisons de chasse. Leur densité décline lentement de 0.04 vers 0.028 sur 50 ans, car la ressource en proies diminue progressivement.
 
 Les **ours**, omnivores sans prédateur supérieur et sans prélèvement humain, croissent de façon monotone de 0.25 jusqu'à environ 1 animal·km⁻² à t = 50 ans — un facteur quatre. C'est la conséquence directe de leur omnivorie : ils bénéficient à la fois des ongulés et de la végétation.
