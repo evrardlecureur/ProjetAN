@@ -116,7 +116,7 @@ Et justement, Romain va maintenant vous montrer ce que ce code a produit concrè
 
 Cette simulation de référence sur 50 ans avec RK4 à h = 0.005 an — soit environ 1.8 jour par pas — **valide le modèle** : tous les comportements qualitatifs attendus de l'énoncé sont présents.
 
-La **végétation** décroît rapidement les premières années sous l'effet du pâturage intense, puis se stabilise aux alentours de 434 kg·km⁻² — soit 6 kg sous la capacité de charge maximale K_V = 500. Le pâturage permanent maintient un écart non nul avec K_V, ce qui est écologiquement cohérent.
+La **végétation** décroît rapidement les premières années sous l'effet du pâturage intense — elle passe de 440 à environ 433 kg·km⁻² — puis remonte lentement. À t = 50 ans elle n'a pas encore atteint son équilibre, mais tend vers une valeur bien inférieure à K_V = 500. Cet écart permanent avec K_V est écologiquement cohérent : le pâturage continu des trois herbivores empêche la végétation d'atteindre sa capacité de charge maximale.
 
 Les **wapitis** croissent jusqu'à un pic de 4.72 animaux·km⁻² vers t ≈ 15-20 ans, puis déclinent sous la pression combinée des loups et des ours. La dynamique thêta-logistique produit un pic plus marqué et un déclin plus abrupt qu'un modèle logistique classique.
 
