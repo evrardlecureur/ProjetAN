@@ -107,10 +107,10 @@ Et enfin, main.py : c'est le chef d'orchestre qui lance les calculs et génère 
 
 Comme vous pouvez le voir sur le tableau, on a divisé le travail intelligemment pour que chacun ait son propre périmètre et qu'on ne se marche pas dessus lors de nos fusions sur Git.
 
-Et justement, Zouhair va maintenant vous montrer ce que ce code a produit concrètement.
+Et justement, Romain va maintenant vous montrer ce que ce code a produit concrètement.
 ---
 
-## SLIDE 7 — Simulation de Référence — *Zouhair*
+## SLIDE 7 — Simulation de Référence — *Romain*
 
 *[SLIDE 7 — Simulation de base]*
 
