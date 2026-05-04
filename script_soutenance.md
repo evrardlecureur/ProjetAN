@@ -52,19 +52,17 @@ C'est exactement cette différence d'échelles qui a rendu la résolution numér
 
 *[SLIDE 3 — Modèle]*
 
-Le vecteur d'état est à cinq composantes : V pour la végétation, N pour les wapitis, D pour les cerfs, W pour les loups, B pour les ours.
+Le vecteur d'état de notre système contient cinq composantes : V pour la végétation, N pour les wapitis, D pour les cerfs, W pour les loups, et B pour les ours. Je vais vous présenter la logique biologique derrière chaque équation plutôt que de lire les formules — elles sont sur la slide.
 
-Je vais vous présenter la logique biologique derrière chaque équation plutôt que de lire les formules — elles sont sur la slide.
+**Végétation.** La végétation suit une croissance logistique standard vers une capacité de charge maximale de 500 kg par km². Elle est freinée par le pâturage des trois herbivores. Chaque terme de pâturage est une réponse de Holling Type II — c'est-à-dire saturante — avec une demi-saturation différente pour chaque espèce, parce que wapitis, cerfs et ours n'exploitent pas les mêmes strates de végétation.
 
-**Végétation V.** Croissance logistique standard vers K_V = 500 kg·km⁻², freinée par le pâturage des trois herbivores. Chaque terme de pâturage est une réponse de Holling Type II — saturante — avec une demi-saturation différente pour chaque espèce, parce que wapitis, cerfs et ours exploitent des strates de végétation différentes.
+**Wapitis et cerfs.** Ces deux populations suivent une croissance thêta-logistique de Gilpin-Ayala. On utilise θ = 4 pour les wapitis parce qu'avec θ = 1 ou 2, la régulation à la capacité de charge est trop douce — les ongulés la dépassent facilement. Avec θ = 4, la régulation devient très abrupte dès qu'on s'en approche, ce qui correspond aux observations de terrain. La capacité de charge effective dépend de la végétation disponible via une saturation de Monod : quand la végétation tend vers zéro, la capacité de charge tend vers zéro aussi. C'est le mécanisme de famine.
 
-**Wapitis N et cerfs D.** Croissance **thêta-logistique de Gilpin-Ayala**. Pourquoi θ = 4 pour les wapitis ? Parce qu'avec θ = 1 ou 2, la régulation à la capacité de charge est trop douce — les ongulés la dépassent facilement. Avec θ = 4, la régulation est très abrupte dès qu'on approche κ(V), ce qui correspond aux observations de terrain. La capacité de charge effective κ(V) dépend de la végétation via une saturation de Monod : quand V tend vers zéro, κ tend vers zéro. C'est le mécanisme de famine.
+Pour la prédation des loups sur les wapitis, on n'utilise pas une réponse proie-dépendante classique. On utilise une réponse ratio-dépendante, où le taux de mise à mort dépend du ratio loups sur wapitis et non de la densité de wapitis seule. Ce choix est justifié par 41 ans de données à Isle Royale qui montrent que le comportement de chasse des loups change avec leur propre densité.
 
-Pour la prédation des loups sur les wapitis, on utilise la **réponse ratio-dépendante** : f_WN = c_WN · N / (W + β·N). Pourquoi pas une réponse proie-dépendante classique comme Holling Type II ? Parce que les données d'Isle Royale sur 41 ans montrent que le taux de mise à mort est mieux prédit par le ratio W/N que par N seul. Le comportement de chasse des loups change avec leur propre densité.
+**Loups.** Le taux de croissance individuel des loups est logarithmique, directement tiré de Vucetich et al. 2011 et calibré sur ces 41 ans de données. La relation est concave : manger plus aide à se reproduire, mais avec des rendements décroissants. Le paramètre η évite la divergence du logarithme quand l'apport alimentaire tend vers zéro. Le terme sin²(πt) introduit la chasse saisonnière humaine : nul en hiver, maximal en automne. C'est ce qui rend le système non autonome et contribue à sa raideur.
 
-**Loups W.** Le taux de croissance individuel est logarithmique : r_W = ε₁·ln(Φ_W + η) − ε₂, directement tiré de Vucetich et al. 2011, calibré sur ces 41 ans de données. Le terme η évite la divergence du logarithme quand Φ_W tend vers zéro — sans lui, le taux de croissance divergerait vers moins l'infini biologiquement. Le terme **sin²(πt) crée le forçage saisonnier** : nul en t = 0, 1, 2... et maximal en t = 0.5, 1.5... — la saison de chasse automnale. C'est ce qui rend le système non autonome et contribue à sa raideur.
-
-**Ours B.** Les ours sont omnivores : leur taux de croissance par individu combine la prédation sur les ongulés — réponses Type II sur N et D — et la consommation directe de végétation. Aucun terme de prélèvement humain ne pèse sur eux, contrairement aux loups. C'est pour ça qu'ils croissent de façon monotone dans nos simulations.
+**Ours.** Les ours sont omnivores. Leur taux de croissance combine la prédation sur les deux populations d'ongulés et la consommation directe de végétation. Contrairement aux loups, aucun prélèvement humain ne pèse sur eux dans notre modèle, ce qui explique leur croissance monotone dans nos simulations.
 
 ---
 
