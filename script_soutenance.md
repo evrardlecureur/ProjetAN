@@ -54,7 +54,7 @@ C'est exactement cette différence d'échelles qui a rendu la résolution numér
 
 Le vecteur d'état de notre système contient cinq composantes : V pour la végétation, N pour les wapitis, D pour les cerfs, W pour les loups, et B pour les ours. On va voir la logique biologique derrière chaque équation.
 
-**Végétation.** La végétation suit une croissance logistique standard vers une capacité de charge maximale de 500 kg par km². Elle est freinée par le pâturage des trois herbivores. Chaque terme de pâturage est une réponse de Holling Type II — c'est-à-dire saturante — avec une demi-saturation différente pour chaque espèce, parce que wapitis, cerfs et ours n'exploitent pas les mêmes strates de végétation.
+**Végétation.** La végétation suit une croissance logistique standard vers une capacité de charge maximale de 500 kg par km². Elle est freinée par le pâturage des trois herbivores. Chaque terme de pâturage est une réponse de Holling Type II — c'est-à-dire saturante — avec une demi-saturation différente pour chaque espèce, parce que wapitis, cerfs et ours n'exploitent pas les mêmes types de végétation.
 
 **Wapitis et cerfs.** Ces deux populations suivent une croissance thêta-logistique de Gilpin-Ayala. On utilise θ = 4 pour les wapitis parce qu'avec θ = 1 ou 2, la régulation à la capacité de charge est trop douce — les ongulés la dépassent facilement. Avec θ = 4, la régulation devient très abrupte dès qu'on s'en approche, ce qui correspond aux observations de terrain. La capacité de charge effective dépend de la végétation disponible via une saturation de Monod : quand la végétation tend vers zéro, la capacité de charge tend vers zéro aussi. C'est le mécanisme de famine.
 
