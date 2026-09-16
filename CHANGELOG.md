@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- CI: Ruff, the simulations run end to end with the empirical orders in the summary and the figures as artifact, report built with Tectonic, markdownlint and lychee, dependency review and CodeQL (Python and workflows)
+- CI: Ruff, the simulations run end to end with the empirical orders in the summary and the figures as artifact, report built with Tectonic, markdownlint and lychee and CodeQL (Python and workflows)
 - Dependabot for the Python dependencies and the GitHub Actions
 - MIT License, contributing guide, code of conduct, security policy, citation metadata, issue forms and pull request template
 - Pinned dependencies in `requirements.txt` and `requirements-dev.txt`

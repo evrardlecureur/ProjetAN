@@ -93,7 +93,7 @@ ProjetAN/
 ## ✅ Quality
 
 - **CI** (`.github/workflows/ci.yml`): Ruff, the simulations run end to end with the empirical orders published in the job summary and the figures uploaded as an artifact, the report built with Tectonic, the Markdown files checked with markdownlint and lychee.
-- **CodeQL** on Python and the workflows, **Dependabot** for the Python dependencies and the GitHub Actions, **dependency review** on pull requests.
+- **CodeQL** on Python and the workflows, **Dependabot** for the Python dependencies and the GitHub Actions.
 
 ## 👥 Authors
 

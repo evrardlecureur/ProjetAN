@@ -37,10 +37,9 @@ As this is an educational project, security issues should be reported responsibl
 
 * **CodeQL** code scanning (advanced setup, `.github/workflows/codeql.yml`) for every pull request, every push to `main` and once a week.
 * **Dependabot** version updates for the GitHub Actions and the Python dependencies pinned in `requirements*.txt`, grouped by patch and minor updates.
-* **Dependency review** blocks pull requests that introduce dependencies with known vulnerabilities of moderate severity or higher.
 * **Least privilege**: the workflows only get read access to the repository, plus the write access to security events that CodeQL needs to upload its results.
 
-The settings that only the owner of the repository can change (branch protection, Dependabot security updates, secret scanning, private vulnerability reporting) are not part of this policy.
+The settings that only the owner of the repository can change (branch protection, dependency graph and dependency review, Dependabot security updates, secret scanning, private vulnerability reporting) are not part of this policy.
 
 ## Response
 
