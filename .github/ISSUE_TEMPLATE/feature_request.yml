@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an additional analysis, a new figure or better documentation.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - "Model"
+        - "Solvers"
+        - "Scenarios and figures"
+        - "Report and slides"
+        - "Documentation (README)"
+        - "CI"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing or could be improved, and in which situation?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you implement it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you thought about and why you prefer this one.

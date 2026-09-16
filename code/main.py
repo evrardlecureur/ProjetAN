@@ -1,13 +1,11 @@
 # main.py - simulations et graphiques
 # scénarios : base + Yellowstone + convergence
 
-import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-
-from params import *
+import numpy as np
 from model import F
-from solvers import euler_explicite, euler_implicite, runge_kutta_4, crank_nicolson
+from params import *
+from solvers import crank_nicolson, euler_explicite, euler_implicite, runge_kutta_4
 
 # labels et couleurs pour les graphiques
 LABELS = ["Végétation V", "Wapitis N", "Cerfs D", "Loups W", "Ours B"]
@@ -137,11 +135,11 @@ def phase_portrait(ax, X, Y, t_col, xlabel, ylabel, title, cmap="viridis"):
 phase_portrait(axes[0,0], U_base[:,1],   U_base[:,3],   t_base,
                "Wapitis N", "Loups W", "Référence — N vs W")
 phase_portrait(axes[0,1], U_yellow[:,1], U_yellow[:,3], t_yellow,
-               "Wapitis N", "Loups W", f"Yellowstone — N vs W", cmap="plasma")
+               "Wapitis N", "Loups W", "Yellowstone — N vs W", cmap="plasma")
 phase_portrait(axes[1,0], U_base[:,2],   U_base[:,3],   t_base,
                "Cerfs D", "Loups W", "Référence — D vs W")
 phase_portrait(axes[1,1], U_yellow[:,2], U_yellow[:,3], t_yellow,
-               "Cerfs D", "Loups W", f"Yellowstone — D vs W", cmap="plasma")
+               "Cerfs D", "Loups W", "Yellowstone — D vs W", cmap="plasma")
 
 plt.tight_layout()
 plt.savefig("fig4_portraits_phase.png", dpi=150, bbox_inches="tight")
@@ -187,7 +185,7 @@ p_imp  = ordre(h_arr, err_imp)
 p_cn   = ordre(h_arr, err_cn)
 p_rk4  = ordre(h_arr, err_rk4)
 
-print(f"Ordres empiriques :")
+print("Ordres empiriques :")
 print(f"  Euler explicite : {p_exp:.2f}  (théorique : 1)")
 print(f"  Euler implicite : {p_imp:.2f}  (théorique : 1)")
 print(f"  Crank-Nicolson  : {p_cn:.2f}   (théorique : 2)")

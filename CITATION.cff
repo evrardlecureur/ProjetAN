@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it using the metadata below."
+type: software
+title: "ProjetAN: numerical simulation of a trophic cascade with five coupled ODEs"
+abstract: >-
+  Numerical analysis project at Polytech Nice Sophia (MAM3): a model of a
+  trophic cascade (vegetation, elk, deer, wolves, bears) as five coupled
+  nonlinear ODEs, solved with explicit Euler, implicit Euler, Crank-Nicolson
+  and RK4 in Python. Includes a Yellowstone scenario where wolves are
+  reintroduced after 20 years and a convergence study of the four methods.
+authors:
+  - given-names: Evrard
+    family-names: Lecureur
+    affiliation: "Polytech Nice Sophia, Université Côte d'Azur"
+  - given-names: Romain
+    family-names: Ben
+    affiliation: "Polytech Nice Sophia, Université Côte d'Azur"
+  - given-names: Thibaud
+    family-names: Crotta
+    affiliation: "Polytech Nice Sophia, Université Côte d'Azur"
+  - given-names: Zouhair
+    family-names: Saitout
+    affiliation: "Polytech Nice Sophia, Université Côte d'Azur"
+version: 1.0.0
+date-released: 2026-05-04
+license: MIT
+repository-code: "https://github.com/evrardlecureur/ProjetAN"
+keywords:
+  - numerical analysis
+  - ordinary differential equations
+  - Runge-Kutta
+  - Crank-Nicolson
+  - implicit Euler
+  - trophic cascade
+  - Yellowstone
+  - Python
+  - NumPy
