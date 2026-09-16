@@ -1,0 +1,18 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = [
+  # The model parameters are imported with `from params import *` on purpose:
+  # the equations read like the report.
+  "F403",
+  "F405",
+  # The closures `G` of the implicit solvers are consumed inside the iteration.
+  "B023",
+  # `zip(..., strict=True)` and the unused index of `enumerate` are style
+  # choices of the original code.
+  "B905",
+  "B007",
+]

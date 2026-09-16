@@ -5,6 +5,7 @@
 import numpy as np
 from params import *
 
+
 def F(t, u):
     V, N, D, W, B = u
 
